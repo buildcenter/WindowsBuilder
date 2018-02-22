@@ -49,7 +49,7 @@ RequiredFileNotFound = A required file was not found: {0}
 RequiredFolderNotFound = A required folder was not found: {0}
 RemovingUnexpectedFile = Removing unexpected file in path: {0}
 CreatingFolder = Creating folder: {0}
-RegistryMountPointNotSpecifiedOrInvalid = The registry mount point path for "{0}" is invalid: {1}
+RegistryMountPointNotSpecifiedOrInvalid = The registry mount point path for "{0}" must start with "HKLM:\": {1}
 RegistryMountPointExists = The registry mount point path already exists: {0}
 
 #

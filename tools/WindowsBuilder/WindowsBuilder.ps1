@@ -238,6 +238,7 @@ task Setup -depends Precheck {
 	    "    'Windows/System32/config/SECURITY' = 'HKLM:\\svc_security'"
 	    "    'Windows/System32/config/SOFTWARE' = 'HKLM:\\svc_software'"
 	    "    'Windows/System32/config/SYSTEM' = 'HKLM:\\svc_system'"
+        "    'Users/Default/NTUSER.DAT' = 'HKLM:\\svc_user'"
         '}'
     )
 
@@ -342,8 +343,9 @@ task Setup -depends Precheck {
 	        'Windows/System32/config/SECURITY'
 	        'Windows/System32/config/SOFTWARE'
 	        'Windows/System32/config/SYSTEM'
+            'Users/Default/NTUSER.DAT'
         ) | ForEach-Object {
-            assert (($BuildEnv.registryMountPoint."$_" -like 'HKLM:\*') -or ($BuildEnv.registryMountPoint."$_" -like 'HKU:\*')) ($sr.RegistryMountPointNotSpecifiedOrInvalid -f $_, $BuildEnv.registryMountPoint."$_")
+            assert ($BuildEnv.registryMountPoint."$_" -like 'HKLM:\*') ($sr.RegistryMountPointNotSpecifiedOrInvalid -f $_, $BuildEnv.registryMountPoint."$_")
             assert (-not (Test-Path $BuildEnv.registryMountPoint."$_")) ($sr.RegistryMountPointExists -f $BuildEnv.registryMountPoint."$_")
         }
     }
@@ -403,6 +405,12 @@ task Mount -depends Setup -precondition { $Subcommand -eq 'Mount' } {
     {
         $refWimPath = $ReferenceImagePath
     }
+
+    if (-not [system.io.path]::IsPathRooted($refWimPath))
+    {
+        $refWimPath = Join-Path $BuildEnv.repoDir -ChildPath $refWimPath
+    }
+    $refWimPath = Resolve-Path $refWimPath | select -expand Path
 
     assert (Test-Path $refWimPath -PathType Leaf) ($sr.ReferenceImageFileNotFound -f $refWimPath)
 
