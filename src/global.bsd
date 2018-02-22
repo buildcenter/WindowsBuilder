@@ -53,4 +53,5 @@
 #	'Windows/System32/config/SECURITY' = 'HKLM:\\svc_security'
 #	'Windows/System32/config/SOFTWARE' = 'HKLM:\\svc_software'
 #	'Windows/System32/config/SYSTEM' = 'HKLM:\\svc_system'
+#	'Users/Default/NTUSER.DAT' = 'HKLM:\\svc_user'
 #}

@@ -56,7 +56,7 @@ task ModifyRegistry -depends MountRegistry {
 	}
 
     $oemProps = $BuildEnv.oemInfo | Get-Member -MemberType NoteProperty | select -expand Name
-    $oemProps | where { $_ -notin @('Logo', 'HelpCustomized') } | ForEach-Object {
+    $oemProps | where { $_ -notin @('Logo', 'HelpCustomized', 'pcLogo', 'helpLogo') } | ForEach-Object {
         say ("Set OEM: {0} = {1}" -f $_, $BuildEnv.oemInfo."$_")
 	    Set-ItemProperty -Path $regBasePath -Name $_ -Value $BuildEnv.oemInfo."$_"
     }

@@ -58,6 +58,10 @@
 
 # ----------- custom -----------
 
+driver {
+	path = ${resDir}'\\Drivers'	
+}
+
 appx {
     remove = [
 		# --- Help and telemetry ---
@@ -319,26 +323,142 @@ bsodColor {
 	background = 'red'
 }
 
-consoleColor {
-	# solarized dark theme
-	# https://github.com/neilpa/cmd-colors-solarized/blob/master/solarized-dark.reg
+wallpaper {
+	# 1920x1200
+	default = 'default-wallpaper.jpg'
 
-	ColorTable00 = '00362b00'
-	ColorTable01 = '00969483'
-	ColorTable02 = '00756e58'
-	ColorTable03 = '00a1a193'
-	ColorTable04 = '00164bcb'
-	ColorTable05 = '00c4716c'
-	ColorTable06 = '00837b65'
-	ColorTable07 = '00d5e8ee'
-	ColorTable08 = '00423607'
-	ColorTable09 = '00d28b26'
-	ColorTable10 = '00009985'
-	ColorTable11 = '0098a12a'
-	ColorTable12 = '002f32dc'
-	ColorTable13 = '008236d3'
-	ColorTable14 = '000089b5'
-	ColorTable15 = '00e3f6fd'
-	ScreenColors = '00000001'
-	PopupColors = '000000f6'
+	'default4k-1024x768' = 'default-wallpaper-1024x768.jpg'
+	'default4k-1200x1920' = 'default-wallpaper-1200x1920.jpg'
+	'default4k-1366x768' = 'default-wallpaper-1366x768.jpg'
+	'default4k-1600x2560' = 'default-wallpaper-1600x2560.jpg'
+	'default4k-2160x3840' = 'default-wallpaper-2160x3840.jpg'
+	'default4k-2560x1600' = 'default-wallpaper-2560x1600.jpg'
+	'default4k-3840x2160' = 'default-wallpaper-3840x2160.jpg'
+	'default4k-768x1024' = 'default-wallpaper-768x1024.jpg'
+	'default4k-768x1366' = 'default-wallpaper-768x1366.jpg'
+	removeExtra = true
 }
+
+lockScreen {
+	# 3840x2160
+	default = 'default-lockscreen-3840x2160.jpg'
+	removeExtra = true
+}
+
+accountPicture {
+	guestBmp = 'guest.bmp'
+	guestPng = 'guest.png'
+	userBmp = 'user.bmp'
+	userPng = 'user.png'
+	user32 = 'user-32.png'
+	user40 = 'user-40.png'
+	user48 = 'user-48.png'
+	user192 = 'user-192.png'
+}
+
+# This will also enable startup sound to play on startup
+startupSound {
+	waveFile = 'Windows-Startup.wav'
+}
+
+# #todo persons and pin in win10-1709
+cursors {
+	default {
+		Scheme = 'Haro Black'
+		AppStarting = 'haro_working.ani'
+		Arrow = 'haro_arrow.cur'
+		Crosshair = 'haro_cross.cur'
+		Hand = 'haro_link.cur'
+		Help = 'haro_helpsel.ani'
+		IBeam = 'haro_beam.cur'
+		No = 'haro_unavail.cur'
+		NWPen = 'haro_pen.cur'
+		SizeAll = 'haro_move.cur'
+		SizeNESW = 'haro_nesw.cur'
+		SizeNS = 'haro_ns.cur'
+		SizeNWSE = ' haro_nwse.cur'
+		SizeWE = 'haro_ew.cur'
+		UpArrow = 'haro_up.cur'
+		Wait = 'haro_busy.ani'
+	}
+	schemes {
+		'Haro Black' = [
+			'haro_arrow.cur'
+			'haro_helpsel.ani'
+			'haro_working.ani'
+			'haro_busy.ani'
+			'haro_cross.cur'
+			'haro_beam.cur'
+			'haro_pen.cur'
+			'haro_unavail.cur'
+			'haro_ns.cur'
+			'haro_ew.cur'
+			'haro_nwse.cur'
+			'haro_nesw.cur'
+			'haro_move.cur'
+			'haro_up.cur'
+			'haro_link.cur'
+		]
+		'Haro Black (large)' = [
+			'haro_arrow_l.cur'
+			'haro_helpsel_l.ani'
+			'haro_working_l.ani'
+			'haro_busy_l.ani'
+			'haro_cross_l.cur'
+			'haro_beam_l.cur'
+			'haro_pen_l.cur'
+			'haro_unavail_l.cur'
+			'haro_ns_l.cur'
+			'haro_ew_l.cur'
+			'haro_nwse_l.cur'
+			'haro_nesw_l.cur'
+			'haro_move_l.cur'
+			'haro_up_l.cur'
+			'haro_link_l.cur'
+		]
+	}
+}
+
+themeColor {
+	AccentColor = '0x2a29cc'
+	AccentColorInactive = '0x00cfcfcf'
+	ColorPrevalence = "1"
+	AccentPalette = 'ff,b3,b3,00,ff,80,80,00,ff,59,5a,00,cc,29,2a,00,99,00,01,00,73,00,01,00,4d,00,00,00,88,17,98,00'
+	StartColorMenu = '0xff010099'
+	AccentColorMenu = '0xff0100cc'
+
+	oemColors = [
+		'0x001500BE'
+		'0x000040E6'
+		'0x0002C6F8'
+		'0x00269A00'
+		'0x00A79571'
+		'0x000B2652'
+		'0x00533C60'
+		'0x006E38FE'
+	]
+}
+
+#consoleColor {
+#	# solarized dark theme
+#	# https://github.com/neilpa/cmd-colors-solarized/blob/master/solarized-dark.reg
+#
+#	ColorTable00 = '00362b00'
+#	ColorTable01 = '00969483'
+#	ColorTable02 = '00756e58'
+#	ColorTable03 = '00a1a193'
+#	ColorTable04 = '00164bcb'
+#	ColorTable05 = '00c4716c'
+#	ColorTable06 = '00837b65'
+#	ColorTable07 = '00d5e8ee'
+#	ColorTable08 = '00423607'
+#	ColorTable09 = '00d28b26'
+#	ColorTable10 = '00009985'
+#	ColorTable11 = '0098a12a'
+#	ColorTable12 = '002f32dc'
+#	ColorTable13 = '008236d3'
+#	ColorTable14 = '000089b5'
+#	ColorTable15 = '00e3f6fd'
+#	ScreenColors = '00000001'
+#	PopupColors = '000000f6'
+#}
