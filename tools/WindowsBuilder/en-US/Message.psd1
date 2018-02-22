@@ -80,11 +80,17 @@ DismountDiscardChange = Dismounting image and discarding changes. This may take 
 DismountSaveChange = Dismounting image and commiting changes. This may take a while...
 
 #
+# Driver
+#
+RemovingExistingDriverDump = Removing existing driver dump: {0}
+DumpingDrivers = Dumping all add-on drivers to "{0}". This may take a while...
+
+#
 # Build
 #
 NoTargetModule = Unable to build because there is no effective targets.
 StartBuildModule = Starting build module: {0}
-
+DriverCommandNothingToDo = You need to type "build driver dump".
 
 # ---- [ /Localized Data ] --------------------------------------------
 '@

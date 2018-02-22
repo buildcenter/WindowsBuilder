@@ -14,6 +14,9 @@
     [bool]$ListAvailable = $false
     [int]$ImageIndex = -1
     [string]$ReferenceImagePath = $null
+
+    # where Subcommand = 'Driver'
+    [bool]$DumpDriver = $false
 }
 
 printTask {
@@ -85,6 +88,7 @@ task Help -depends Localize -precondition { $Subcommand -eq 'Help' } {
         'build mount <path\to\install.wim> [?|<index>]'
         'build dismount [undo]'
         'build [configuration]'
+        'build driver dump'
     )
 
     $examples = @{}
@@ -159,7 +163,7 @@ task Help -depends Localize -precondition { $Subcommand -eq 'Help' } {
 task Precheck -depends Localize {
     $sr = $BuildEnv.BMLocalizedData
 
-    $supportedSubcommands = @('Build', 'Mount', 'Dismount', 'Help', 'Configure')
+    $supportedSubcommands = @('Build', 'Mount', 'Dismount', 'Help', 'Configure', 'Driver')
     assert ($Subcommand -in $supportedSubcommands) ($sr.UnsupportedSubcommand -f $Subcommand, ($supportedSubcommands -join ', '))
 
     # Configuration check. We still need to check further in setup
@@ -440,6 +444,28 @@ task Dismount -depends Setup -precondition { $Subcommand -eq 'Dismount' } {
     }
 }
 
+task Driver -depends Setup -precondition { $Subcommand -eq 'Driver' } {
+    $sr = $BuildEnv.BMLocalizedData
+
+    if ($DumpDriver -eq $true)
+    {
+        $driverOutputPath = Join-Path $BuildEnv.resDir -ChildPath 'Drivers'
+        if (Test-Path $driverOutputPath)
+        {
+            say ($sr.RemovingExistingDriverDump -f $driverOutputPath)
+            rd $driverOutputPath -Recurse -Force
+        }
+        md $driverOutputPath | Out-Null
+
+        say ($sr.DumpingDrivers -f $driverOutputPath)
+        Export-WindowsDriver -Online -Destination $driverOutputPath
+    }
+    else
+    {
+        say ($sr.DriverCommandNothingToDo)
+    }
+}
+
 task Build -depends Discover -precondition { $Subcommand -eq 'Build' } {
     $sr = $BuildEnv.BMLocalizedData
 
@@ -482,7 +508,7 @@ task Build -depends Discover -precondition { $Subcommand -eq 'Build' } {
     }
 }
 
-task Finish -depends Help, Configure, Build, Mount, Dismount {
+task Finish -depends Help, Configure, Build, Mount, Dismount, Driver {
     $sr = $BuildEnv.BMLocalizedData
 
     say $sr.Goodbye

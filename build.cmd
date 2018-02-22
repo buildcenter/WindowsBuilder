@@ -28,6 +28,10 @@ rem dismount
 rem build dismount [undo]
 if '%1'=='dismount' goto cmd_dismount
 
+rem driver
+rem build driver dump
+if '%1'=='driver' goto cmd_driver
+
 rem defaults to build [configuration-name]
 goto cmd_build
 
@@ -70,6 +74,19 @@ exit /B %errorlevel%
 
 :dismount_undo
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& '%SCRIPTDIR%\tools\Builder\Builder.ps1' '%SCRIPTDIR%\tools\WindowsBuilder\WindowsBuilder.ps1' -properties @{ Subcommand = 'Dismount'; Undo = $true }; if ($BuildEnv.BuildSuccess -eq $false) { exit 1 } else { exit 0 }"
+exit /B %errorlevel%
+
+
+:cmd_driver
+rem build driver dump
+set SUBCOMMAND=%1
+shift
+if '%1'=='dump' goto driver_dump
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& '%SCRIPTDIR%\tools\Builder\Builder.ps1' '%SCRIPTDIR%\tools\WindowsBuilder\WindowsBuilder.ps1' -properties @{ Subcommand = 'Driver'; }; if ($BuildEnv.BuildSuccess -eq $false) { exit 1 } else { exit 0 }"
+exit /B %errorlevel%
+
+:driver_dump
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& '%SCRIPTDIR%\tools\Builder\Builder.ps1' '%SCRIPTDIR%\tools\WindowsBuilder\WindowsBuilder.ps1' -properties @{ Subcommand = 'Driver'; DumpDriver = $true }; if ($BuildEnv.BuildSuccess -eq $false) { exit 1 } else { exit 0 }"
 exit /B %errorlevel%
 
 
