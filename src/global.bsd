@@ -1,0 +1,56 @@
+# ==============================
+# Default global configuration
+# ==============================
+
+# Hardcoded properties
+# --------------------
+# There are 4 very important automated properties:
+# - build-configuration Resolved build configuration
+# - hostOS             $env:OS
+# - dirSeparator       OS directory separator
+# - windowsBuilderDir  Absolute path to 'WindowsBuilder.ps1'
+# - rootDir            Drive root for 'windowsBuilderDir'
+# - toolsDir           One level above windowsBuilderDir
+# - repoDir            One level above toolsDir
+# - sourceDir          Under (repoDir)/src
+#
+# Do not try to override these values. You will most likely cause something wierd to happen.
+#
+# There are also a few properties that are hardcoded but meant to be changed where appropriate:
+# - workingDir         Under (repoDir)/working
+# - mountDir           Under (workingDir)/mount
+# - outputDir          Under (workingDir)/output
+# - tempDir            Under (repoDir)/temp
+# - resDir             Under (repo)/resource
+# - templateHelperScriptFile   (toolsDir)\template_helpers.ps1
+#
+# You are free to override their values, but we only recommend changing the following where appropriate:
+# - workingDir, mountDir and outputDir (they must be changed together)
+# - tempDir
+# - resDir
+#
+# Note that we convert these default paths to absolute paths, and resolve '/' to '\'. So the 
+# following is not exactly the default values.
+
+# workingDir = ${repoDir}'/working'
+# mountDir = ${workingDir}'/mount'
+# outputDir = ${workingDir}'/output'
+# tmpDir = ${repoDir}'/temp'
+# resDir = ${repoDir}'/resource'
+# templateHelperScriptFile = ${toolsDir}'/template_helpers.ps1'
+
+# Registry mount points
+# ---------------------
+# Some scripts will need to temporarily mount registry hives from the servicing Windows image to your 
+# live host. You can set their registry mount points here.
+# 
+# Note that mountpoint must start with `HKLM:\\` or `HKU:\\`. We don't recommend changing these defaults.
+#registryMountPoint {
+#	'Windows/System32/config/COMPONENTS' = 'HKLM:\\svc_components'
+#	'Windows/System32/config/DEFAULT' = 'HKLM:\\svc_default'
+#	'Windows/System32/config/DRIVERS' = 'HKLM:\\svc_drivers'
+#	'Windows/System32/config/SAM' = 'HKLM:\\svc_sam'
+#	'Windows/System32/config/SECURITY' = 'HKLM:\\svc_security'
+#	'Windows/System32/config/SOFTWARE' = 'HKLM:\\svc_software'
+#	'Windows/System32/config/SYSTEM' = 'HKLM:\\svc_system'
+#}

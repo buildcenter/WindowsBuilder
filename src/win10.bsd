@@ -1,0 +1,344 @@
+# ==============================
+# Default global configuration
+# ==============================
+
+# Hardcoded properties
+# --------------------
+# There are 4 very important automated properties:
+# - build-configuration Resolved build configuration
+# - hostOS             $env:OS
+# - dirSeparator       OS directory separator
+# - windowsBuilderDir  Absolute path to 'WindowsBuilder.ps1'
+# - rootDir            Drive root for 'windowsBuilderDir'
+# - toolsDir           One level above windowsBuilderDir
+# - repoDir            One level above toolsDir
+# - sourceDir          Under (repoDir)/src
+#
+# Do not try to override these values. You will most likely cause something wierd to happen.
+#
+# There are also a few properties that are hardcoded but meant to be changed where appropriate:
+# - workingDir         Under (repoDir)/working
+# - mountDir           Under (workingDir)/mount
+# - outputDir          Under (workingDir)/output
+# - tempDir            Under (repoDir)/temp
+# - resDir             Under (repo)/resource
+# - templateHelperScriptFile   (toolsDir)\template_helpers.ps1
+#
+# You are free to override their values, but we only recommend changing the following where appropriate:
+# - workingDir, mountDir and outputDir (they must be changed together)
+# - tempDir
+# - resDir
+#
+# Note that we convert these default paths to absolute paths, and resolve '/' to '\'. So the 
+# following is not exactly the default values.
+
+# workingDir = ${repoDir}'/working'
+# mountDir = ${workingDir}'/mount'
+# outputDir = ${workingDir}'/output'
+# tmpDir = ${repoDir}'/temp'
+# resDir = ${repoDir}'/resource'
+# templateHelperScriptFile = ${toolsDir}'/template_helpers.ps1'
+
+# Registry mount points
+# ---------------------
+# Some scripts will need to temporarily mount registry hives from the servicing Windows image to your 
+# live host. You can set their registry mount points here.
+# 
+# Note that mountpoint must start with `HKLM:\\` or `HKU:\\`. We don't recommend changing these defaults.
+#registryMountPoint {
+#	'Windows/System32/config/COMPONENTS' = 'HKLM:\\svc_components'
+#	'Windows/System32/config/DEFAULT' = 'HKLM:\\svc_default'
+#	'Windows/System32/config/DRIVERS' = 'HKLM:\\svc_drivers'
+#	'Windows/System32/config/SAM' = 'HKLM:\\svc_sam'
+#	'Windows/System32/config/SECURITY' = 'HKLM:\\svc_security'
+#	'Windows/System32/config/SOFTWARE' = 'HKLM:\\svc_software'
+#	'Windows/System32/config/SYSTEM' = 'HKLM:\\svc_system'
+#}
+
+
+# ----------- custom -----------
+
+appx {
+    remove = [
+		# --- Help and telemetry ---
+
+		'Microsoft.GetHelp'
+		'Microsoft.Getstarted'
+		'Microsoft.WindowsFeedbackHub'
+
+
+		# --- Communication ---
+
+		# remove if you don't want your users to link their private Microsoft accounts to their user profile
+		'Microsoft.Messaging'
+
+		# Mail and calendar
+		'microsoft.windowscommunicationsapps'
+
+		# Paid WiFi
+		'Microsoft.OneConnect'
+
+		'Microsoft.People'
+		'Microsoft.SkypeApp'
+
+
+		# --- Windows Store ---
+
+		# Required to download apps
+		#'Microsoft.WindowsStore'
+
+		# Required for in-app purchases
+		'Microsoft.StorePurchaseApp'
+
+		# Microsoft Pay
+		'Microsoft.Wallet'
+
+
+		# --- XBOX ---
+
+		'Microsoft.Xbox.TCUI'
+		'Microsoft.XboxApp'
+		'Microsoft.XboxGameOverlay'
+		'Microsoft.XboxIdentityProvider'
+		'Microsoft.XboxSpeechToTextOverlay'
+
+
+		# --- Apps ---
+
+		# an advertisement for Microsoft Office 365 and useless regardless of whether you already use Office or plan to use Office in the future
+		'Microsoft.MicrosoftOfficeHub'
+
+		# metro version of onenote. Microsoft Office brings the full version of OneNote
+		'Microsoft.Office.OneNote'
+
+		'Microsoft.WindowsMaps'
+		'Microsoft.BingWeather'
+		'Microsoft.Microsoft3DViewer'
+		'Microsoft.MicrosoftSolitaireCollection'
+		'Microsoft.MicrosoftStickyNotes'
+		'Microsoft.MSPaint'
+		'Microsoft.Print3D'
+
+		#'Microsoft.ZuneMusic'
+		#'Microsoft.ZuneVideo'
+		#'Microsoft.Windows.Photos'
+		#'Microsoft.WindowsAlarms'
+		#'Microsoft.WindowsCalculator'
+		#'Microsoft.WindowsCamera'
+		#'Microsoft.WindowsSoundRecorder'
+    ]
+}
+
+package {
+	unprotect = [
+		# --- search ---
+		'Microsoft-Windows-Cortana-*'
+
+		# --- shell ---
+		'Microsoft-Windows-Shell-SoundThemes-*'
+		# Win10-Anniversary: breaks with 'HomeGroup-printscan-Package'
+		#'Microsoft-Windows-Shell-HomeGroup-*'
+
+		# --- features ---
+		'Adobe-Flash-*'
+		# cdm is used by ms and partners to push adverts
+		'Microsoft-Windows-ContentDeliveryManager-*'
+		'Microsoft-Windows-WinSATMediaFiles-*'
+
+		# --- apps ---
+		'Microsoft-Windows-OneDrive-*'
+		# (new in Win10-Anniversary)
+		'Microsoft-Windows-Skype-*'
+
+		# (deprecated in Win10-Anniversary)
+		#
+		# --- telemetric ---
+		#'Microsoft-OneCore-AllowTelemetry-*'
+		#'Microsoft-OneCore-TroubleShooting-*'
+		#'Microsoft-Windows-DiagTrack-*'
+		# --- support ---
+		#'Microsoft-WindowsFeedback-*'
+		#'Microsoft-Windows-ContactSupport-*'
+		#'Microsoft-Windows-Search2-*'
+		# --- xbox ---
+		#'Microsoft-Xbox-*'
+		#'Microsoft-Windows-Client-Drivers-xbox-*'
+		#'Microsoft-OneCore-AppRuntime-WOW64-xbox-*'
+		#'Microsoft-OneCore-AppRuntime-xbox-*'
+		#'Microsoft-OneCore-Networking-XboxLive-*'
+		#'Microsoft-Windows-Client-Features-Package-AutoMerged-xbox-*'
+		#'Microsoft-Windows-Client-Features-WOW64-Package-AutoMerged-xbox-*'
+		# --- features ---
+		# join azure ad
+		#'Microsoft-OneCore-CloudExperienceHost-*'
+		#'Microsoft-Windows-ParentalControls-*'
+		# seems to break things. bioenrollment still lives :(
+		#'Microsoft-Windows-BioEnrollment-*'
+		# --- apps ---
+		#'Microsoft-Windows-RetailDemo-*'
+		#'Microsoft-Windows-Anytime-Upgrade-*'
+		# excluding add.brokerplugin because it is for active dir
+		# seems to break things. maps still lives :(
+		#'Microsoft-OneCore-Maps-*'
+	]
+
+	remove = ${package.unprotect}
+}
+
+capability {
+	remove = [
+		'App.Support.QuickAssist*'
+		'OneCoreUAP.OneSync*'
+		#'Browser.InternetExplorer*'
+		#'Media.WindowsMediaPlayer*'
+
+		# --- language pack ---
+		#'Language.Basic*'
+		#'Language.Handwriting*'
+		#'Language.OCR*'
+		#'Language.Speech*'
+		#'Language.TextToSpeech*'
+		#'Language.UI.Client*'
+	]
+}
+
+optionalFeatures {
+	enable = [
+		'Microsoft-Hyper-V-All'
+		'Microsoft-Windows-Subsystem-Linux'
+		'TelnetClient'
+		'TFTP'
+	]
+	disable = [
+		'WorkFolders-Client'
+		'Printing-XPSServices-Features'
+		'FaxServicesClientPackage'
+		'Microsoft-Windows-Printing-XPSServices-Package'
+	]
+	remove = [
+		'SMB1Protocol'
+		'SMB1Protocol-Client'
+		'SMB1Protocol-Server'
+	]
+}
+
+tts {
+    enable = true
+}
+
+hostFile {
+    block = [
+	    'vortex.data.microsoft.com'
+	    'vortex-win.data.microsoft.com'
+	    'telecommand.telemetry.microsoft.com'
+	    'telecommand.telemetry.microsoft.com.nsatc.net'
+	    'oca.telemetry.microsoft.com'
+	    'sqm.telemetry.microsoft.com'
+	    'sqm.telemetry.microsoft.com.nsatc.net'
+	    'watson.telemetry.microsoft.com'
+	    'watson.telemetry.microsoft.com.nsatc.net'
+	    'redir.metaservices.microsoft.com'
+	    'choice.microsoft.com'
+	    'choice.microsoft.com.nsatc.net'
+	    'wes.df.telemetry.microsoft.com'
+	    'services.wes.df.telemetry.microsoft.com'
+	    'sqm.df.telemetry.microsoft.com'
+	    'telemetry.microsoft.com'
+	    'watson.ppe.telemetry.microsoft.com'
+	    'telemetry.appex.bing.net'
+	    'telemetry.urs.microsoft.com'
+	    'telemetry.appex.bing.net:443'
+	    'settings-sandbox.data.microsoft.com'
+	    'survey.watson.microsoft.com'
+	    'watson.live.com'
+	    'watson.microsoft.com'
+	    'statsfe2.ws.microsoft.com'
+	    'corpext.msitadfs.glbdns2.microsoft.com'
+	    'compatexchange.cloudapp.net'
+	    'a-0001.a-msedge.net'
+	    'statsfe2.update.microsoft.com.akadns.net'
+	    'sls.update.microsoft.com.akadns.net'
+	    'fe2.update.microsoft.com.akadns.net'
+	    'diagnostics.support.microsoft.com'
+	    'corp.sts.microsoft.com'
+	    'statsfe1.ws.microsoft.com'
+	    'feedback.windows.com'
+	    'feedback.microsoft-hohm.com'
+	    'feedback.search.microsoft.com'
+	    'rad.msn.com'
+	    'preview.msn.com'
+	    'ad.doubleclick.net'
+	    'ads.msn.com'
+	    'ads1.msads.net'
+	    'ads1.msn.com'
+	    'a.ads1.msn.com'
+	    'a.ads2.msn.com'
+	    'adnexus.net'
+	    'adnxs.com'
+	    'az361816.vo.msecnd.net'
+	    'az512334.vo.msecnd.net'
+	    'ssw.live.com'
+	    'ca.telemetry.microsoft.com'
+	    'i1.services.social.microsoft.com'
+	    'i1.services.social.microsoft.com.nsatc.net'
+	    'df.telemetry.microsoft.com'
+	    'reports.wes.df.telemetry.microsoft.com'
+	    'cs1.wpc.v0cdn.net'
+	    'vortex-sandbox.data.microsoft.com'
+	    'oca.telemetry.microsoft.com.nsatc.net'
+	    'pre.footprintpredict.com'
+	    'spynet2.microsoft.com'
+	    'spynetalt.microsoft.com'
+	    'fe3.delivery.dsp.mp.microsoft.com.nsatc.net'
+	    'cache.datamart.windows.com'
+	    'db3wns2011111.wns.windows.com'
+	    'deploy.static.akamaitechnologies.com'
+	    'akamaitechnologies.com'
+    ]
+}
+
+oemInfo {
+	# new in win10-1709
+	#SupportProvider = ''
+	#SupportAppUrl = 'https://get.lizoc.com/pcsupport'
+
+	SupportUrl = 'https://www.lizoc.com/support'
+	Manufacturer = 'Lizoc Inc'
+	Model = 'Generic Model'
+	SupportHours = '(UCT) Mon-Fri: 9:30 AM to 6:00 PM; Sat-Sun: 9:00 AM to 7:00 PM (excluding US public holidays)'
+	SupportPhone = 'US/Canada: +1-800-OEMNAME; E-mail: support@lizoc.com'
+	HelpCustomized = true
+
+	# place these files under /resource
+	helpLogo = 'oemlogo-help.png'
+	pcLogo = 'oemlogo-pc.bmp'
+}
+
+bsodColor {
+	foreground = 'white'
+	background = 'red'
+}
+
+consoleColor {
+	# solarized dark theme
+	# https://github.com/neilpa/cmd-colors-solarized/blob/master/solarized-dark.reg
+
+	ColorTable00 = '00362b00'
+	ColorTable01 = '00969483'
+	ColorTable02 = '00756e58'
+	ColorTable03 = '00a1a193'
+	ColorTable04 = '00164bcb'
+	ColorTable05 = '00c4716c'
+	ColorTable06 = '00837b65'
+	ColorTable07 = '00d5e8ee'
+	ColorTable08 = '00423607'
+	ColorTable09 = '00d28b26'
+	ColorTable10 = '00009985'
+	ColorTable11 = '0098a12a'
+	ColorTable12 = '002f32dc'
+	ColorTable13 = '008236d3'
+	ColorTable14 = '000089b5'
+	ColorTable15 = '00e3f6fd'
+	ScreenColors = '00000001'
+	PopupColors = '000000f6'
+}

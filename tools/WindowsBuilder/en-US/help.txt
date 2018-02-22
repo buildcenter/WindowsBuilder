@@ -1,0 +1,58 @@
+﻿NAME
+    build
+
+SYNOPSIS
+    Build manager for all toolchains :)
+
+SYNTAX
+    build [debug|release|publish] [Project1Name] [Project2Name] [...]
+    build /?|/help|-h|--help [topic]
+
+EXAMPLE #1
+    build /?
+
+    DESCRIPTION
+    -----------
+    Displays this help screen.
+
+EXAMPLE #2
+    build /? topics
+
+    DESCRIPTION
+    -----------
+    Displays a list of topics available.
+
+EXAMPLE #3
+    build
+
+    DESCRIPTION
+    -----------
+    Build all projects in this repo. Configuration by default is 'debug'.
+
+
+EXAMPLE #4
+    build release
+
+    DESCRIPTION
+    -----------
+    Build all projects in this repo. Configuration by 'release'. You can also specify 'debug' or 'publish'.
+
+    What happens in each mode depends on the types of projects being built (i.e. toolchain), but generally:
+
+    * Debug   -> No optimization. Code signing and packaging, if supported, will both be disabled.
+    * Release -> Optimization. Code signing and packaging, if supported, will both be enabled.
+    * Publish -> Same as release, plus pushing to package online repo (if configured).
+
+EXAMPLE #5
+    build debug MyProject1 MyProject2
+
+    DESCRIPTION
+    -----------
+    Build selective projects in this repo. Project names are folders under the '/Source' folder that do not end with '.Tests'. 
+
+
+REMARKS
+    Version 2.0.128.0
+    Created by the Build Team @Lizoc.
+
+    Copyright (c) 2017 Lizoc Inc. All rights reserved.

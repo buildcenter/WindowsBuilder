@@ -1,0 +1,8 @@
+﻿Here are all help topics available locally:
+{0}
+
+To find out more about a topic, type in:
+    build /? <name_of_topic>
+
+More support documents are available online at:
+    http://www.lizoc.com/buildcenter
