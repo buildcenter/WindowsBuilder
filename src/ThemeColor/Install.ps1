@@ -1,70 +1,19 @@
-will {
-	$hklmMountPath = 'HKLM\' + $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE'.Substring(6)	
-    if (Test-Path $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE')
-    {
-        say ("Dismounting registry hive: {0}" -f $hklmMountPath)
-        reg.exe UNLOAD $hklmMountPath
-    }
-    else
-    {
-    	say ("The registry hive does not require dismounting: {0}" -f $hklmMountPath)
-    }
-
-    $hkduMountPoint = 'HKLM\' + $BuildEnv.registryMountPoint.'Windows/System32/config/DEFAULT'.Substring(6)
-    if (Test-Path $BuildEnv.registryMountPoint.'Windows/System32/config/DEFAULT')
-    {
-        say ("Dismounting registry hive: {0}" -f $hkduMountPoint)
-        reg.exe UNLOAD $hkduMountPoint
-    }
-    else
-    {
-        say ("The registry hive does not require dismounting: {0}" -f $hkduMountPoint)
-    }
-
-    $hkuMountPoint = 'HKLM\' + $BuildEnv.registryMountPoint.'Users/Default/NTUSER.DAT'.Substring(6)
-    if (Test-Path $BuildEnv.registryMountPoint.'Users/Default/NTUSER.DAT')
-    {
-        say ("Dismounting registry hive: {0}" -f $hkuMountPoint)
-        reg.exe UNLOAD $hkuMountPoint
-    }
-    else
-    {
-        say ("The registry hive does not require dismounting: {0}" -f $hkuMountPoint)
-    }
-}
-
 task default -depends Finalize
 
 task Precheck {
 	assert ($BuildEnv.themeColor) "The themeColor entry is empty or undefined."
+
+    @(
+        'Windows/System32/config/SOFTWARE'
+        'Windows/System32/config/DEFAULT'
+        'Users/Default/NTUSER.DAT'
+    ) | ForEach-Object {
+        $regPath = $BuildEnv.registryMountPoint."$_"
+        assert (Test-Path $regPath) ("A required registry hive was not loaded: {0}" -f $regPath)
+    }
 }
 
-task MountRegistry -depends Precheck {
-	$regFile = Join-Path $BuildEnv.mountDir -ChildPath 'Windows/System32/config/SOFTWARE'
-	$regPath = $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE'
-	$hklmMountPath = 'HKLM\' + $regPath.Substring(6)
-
-    say ("Mounting registry to hive: {0} --> {1}" -f $regFile, $hklmMountPath)
-	reg.exe LOAD $hklmMountPath $regFile
-
-
-    $regFile = Join-Path $BuildEnv.mountDir -ChildPath 'Windows/System32/config/DEFAULT'
-    $regPath = $BuildEnv.registryMountPoint.'Windows/System32/config/DEFAULT'
-    $hkduMountPath = 'HKLM\' + $regPath.Substring(6)
-
-    say ("Mounting registry to hive: {0} --> {1}" -f $regFile, $hkduMountPath)
-    reg.exe LOAD $hkduMountPath $regFile
-
-
-    $regFile = Join-Path $BuildEnv.mountDir -ChildPath 'Users/Default/NTUSER.DAT'
-    $regPath = $BuildEnv.registryMountPoint.'Users/Default/NTUSER.DAT'
-    $hkuMountPath = 'HKLM\' + $regPath.Substring(6)
-
-    say ("Mounting registry to hive: {0} --> {1}" -f $regFile, $hkuMountPath)
-    reg.exe LOAD $hkuMountPath $regFile
-}
-
-task ModifyRegistry -depends MountRegistry {
+task ModifyRegistry -depends Precheck {
     $dwmBasePath = $BuildEnv.registryMountPoint.'Windows/System32/config/DEFAULT' + '\Software\Microsoft\Windows\DWM'
     $explorerAccentPath = $BuildEnv.registryMountPoint.'Windows/System32/config/DEFAULT' + '\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent'
 
@@ -182,26 +131,6 @@ task ModifyRegistry -depends MountRegistry {
     }
 }
 
-task DismountRegistry -depends ModifyRegistry {
-	$regFile = Join-Path $BuildEnv.mountDir -ChildPath 'Windows/System32/config/SOFTWARE'
-	$regPath = $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE'
-	$hklmMountPath = 'HKLM\' + $regPath.Substring(6)
-    say ("Dismounting registry hive: {0}" -f $hklmMountPath)
-	reg.exe UNLOAD $hklmMountPath
-
-    $regFile = Join-Path $BuildEnv.mountDir -ChildPath 'Windows/System32/config/DEFAULT'
-    $regPath = $BuildEnv.registryMountPoint.'Windows/System32/config/DEFAULT'
-    $hkduMountPath = 'HKLM\' + $regPath.Substring(6)
-    say ("Dismounting registry hive: {0}" -f $hkduMountPath)
-    reg.exe UNLOAD $hkduMountPath
-
-    $regFile = Join-Path $BuildEnv.mountDir -ChildPath 'Users/Default/NTUSER.DAT'
-    $regPath = $BuildEnv.registryMountPoint.'Users/Default/NTUSER.DAT'
-    $hkuMountPath = 'HKLM\' + $regPath.Substring(6)
-    say ("Dismounting registry hive: {0}" -f $hkuMountPath)
-    reg.exe UNLOAD $hkuMountPath
-}
-
-task Finalize -depends Precheck, DismountRegistry {
+task Finalize -depends ModifyRegistry {
 	say 'Done!'
 }

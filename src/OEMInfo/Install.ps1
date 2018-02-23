@@ -1,16 +1,3 @@
-will {
-	$hklmMountPath = 'HKLM\' + $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE'.Substring(6)	
-    if (Test-Path $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE')
-    {
-        say ("Dismounting registry hive: {0}" -f $hklmMountPath)
-        reg.exe UNLOAD $hklmMountPath
-    }
-    else
-    {
-    	say ("The registry hive does not require dismounting: {0}" -f $hklmMountPath)
-    }
-}
-
 task default -depends Finalize
 
 task Precheck {
@@ -36,18 +23,12 @@ task Precheck {
             assert $false ("Resource file not found: {0}" -f $_)
         }
 	}
+
+    $regPath = $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE'
+    assert (Test-Path $regPath) ("A required registry hive was not loaded: {0}" -f $regPath)
 }
 
-task MountRegistry -depends Precheck {
-	$regFile = Join-Path $BuildEnv.mountDir -ChildPath 'Windows/System32/config/SOFTWARE'
-	$regPath = $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE'
-	$hklmMountPath = 'HKLM\' + $regPath.Substring(6)
-
-    say ("Mounting registry to hive: {0} --> {1}" -f $regFile, $hklmMountPath)
-	reg.exe LOAD $hklmMountPath $regFile
-}
-
-task ModifyRegistry -depends MountRegistry {
+task ModifyRegistry -depends Precheck {
     $regBasePath = $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE' + '\Microsoft\Windows\CurrentVersion\OEMInformation'
 
 	If (-not (Test-Path $regBasePath))
@@ -56,7 +37,7 @@ task ModifyRegistry -depends MountRegistry {
 	}
 
     $oemProps = $BuildEnv.oemInfo | Get-Member -MemberType NoteProperty | select -expand Name
-    $oemProps | where { $_ -notin @('Logo', 'HelpCustomized', 'pcLogo', 'helpLogo') } | ForEach-Object {
+    $oemProps | where { $_ -notin @('Logo', 'HelpCustomized', 'pcLogo', 'helpLogo', 'mountRegistryHive') } | ForEach-Object {
         say ("Set OEM: {0} = {1}" -f $_, $BuildEnv.oemInfo."$_")
 	    Set-ItemProperty -Path $regBasePath -Name $_ -Value $BuildEnv.oemInfo."$_"
     }
@@ -76,15 +57,7 @@ task ModifyRegistry -depends MountRegistry {
     }
 }
 
-task DismountRegistry -depends ModifyRegistry {
-	$regFile = Join-Path $BuildEnv.mountDir -ChildPath 'Windows/System32/config/SOFTWARE'
-	$regPath = $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE'
-	$hklmMountPath = 'HKLM\' + $regPath.Substring(6)
-    say ("Dismounting registry hive: {0}" -f $hklmMountPath)
-	reg.exe UNLOAD $hklmMountPath
-}
-
-task CopyFiles -depends DismountRegistry {
+task CopyFiles -depends Precheck {
     $destFolder = Join-Path $BuildEnv.mountDir -ChildPath 'Windows\System32\oobe\Info'
     if (-not (Test-Path $destFolder))
     {
@@ -100,6 +73,6 @@ task CopyFiles -depends DismountRegistry {
     copy $srcPath "$destFolder\"
 }
 
-task Finalize -depends Precheck, CopyFiles {
+task Finalize -depends ModifyRegistry, CopyFiles {
 	say 'Done!'
 }

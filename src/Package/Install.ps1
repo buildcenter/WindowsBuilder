@@ -13,16 +13,18 @@ will {
 
 task default -depends Finalize
 
-task MountRegistry -precondition { $BuildEnv.package.unprotect.Count -ne 0 } {
-	$regFile = Join-Path $BuildEnv.mountDir -ChildPath 'Windows/System32/config/SOFTWARE'
-	$regPath = $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE'
-	$hklmMountPath = 'HKLM\' + $regPath.Substring(6)
+task Precheck {
+	assert ($BuildEnv.themeColor) "The themeColor entry is empty or undefined."
 
-    say ("Mounting registry to hive: {0} --> {1}" -f $regFile, $hklmMountPath)
-	reg.exe LOAD $hklmMountPath $regFile
+    @(
+        'Windows/System32/config/SOFTWARE'
+    ) | ForEach-Object {
+        $regPath = $BuildEnv.registryMountPoint."$_"
+        assert (Test-Path $regPath) ("A required registry hive was not loaded: {0}" -f $regPath)
+    }
 }
 
-task UnprotectPackage -depends MountRegistry -precondition { $BuildEnv.package.unprotect.Count -ne 0 } {
+task UnprotectPackage -depends Precheck -precondition { $BuildEnv.package.unprotect.Count -ne 0 } {
 	$regPath = $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE'
 	$pkgRegPath = Join-Path $regPath -ChildPath 'Microsoft/Windows/CurrentVersion/Component Based Servicing/Packages'
 	$allPackages = dir $pkgRegPath
@@ -63,6 +65,8 @@ task UnprotectPackage -depends MountRegistry -precondition { $BuildEnv.package.u
 				}
 			}
 
+            # Very important. You need to lose the handle or reg mountpoint cannnot be dismounted
+
 			$targetPkgs | ForEach-Object {
 				if ($_.Handle)
 				{
@@ -83,6 +87,9 @@ task UnprotectPackage -depends MountRegistry -precondition { $BuildEnv.package.u
 		}
 	}
 
+    # Again, just to be very safe.
+    # GC collect to be certain!
+
 	$allPackages | ForEach-Object {
 		if ($_.Handle)
 		{
@@ -101,11 +108,13 @@ task UnprotectPackage -depends MountRegistry -precondition { $BuildEnv.package.u
 }
 
 task DismountRegistry -depends UnprotectPackage -precondition { $BuildEnv.package.unprotect.Count -ne 0 } {
+    # we need to dismount it or remove packages won't work
+
 	$regFile = Join-Path $BuildEnv.mountDir -ChildPath 'Windows/System32/config/SOFTWARE'
 	$regPath = $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE'
 	$hklmMountPath = 'HKLM\' + $regPath.Substring(6)
     say ("Dismounting registry hive: {0}" -f $hklmMountPath)
-	reg.exe UNLOAD $hklmMountPath
+	exec { reg.exe UNLOAD $hklmMountPath }
 }
 
 task RemovePackage -depends DismountRegistry -precondition { $BuildEnv.package.remove.Count -ne 0 } {
