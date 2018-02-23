@@ -53,14 +53,11 @@
 #	'Windows/System32/config/SECURITY' = 'HKLM:\\svc_security'
 #	'Windows/System32/config/SOFTWARE' = 'HKLM:\\svc_software'
 #	'Windows/System32/config/SYSTEM' = 'HKLM:\\svc_system'
+#	'Users/Default/NTUSER.DAT' = 'HKLM:\\svc_user'
 #}
 
 
 # ----------- custom -----------
-
-driver {
-	path = ${resDir}'\\Drivers'	
-}
 
 appx {
     remove = [
@@ -134,6 +131,8 @@ appx {
 }
 
 package {
+    mountRegistryHive = ['Windows/System32/config/SOFTWARE']
+
 	unprotect = [
 		# --- search ---
 		'Microsoft-Windows-Cortana-*'
@@ -227,7 +226,7 @@ optionalFeatures {
 }
 
 tts {
-    enable = true
+    mountRegistryHive = ['Windows/System32/config/SOFTWARE']
 }
 
 hostFile {
@@ -302,6 +301,8 @@ hostFile {
 }
 
 oemInfo {
+    mountRegistryHive = ['Windows/System32/config/SOFTWARE']
+
 	# new in win10-1709
 	#SupportProvider = ''
 	#SupportAppUrl = 'https://get.lizoc.com/pcsupport'
@@ -363,6 +364,12 @@ startupSound {
 
 # #todo persons and pin in win10-1709
 cursors {
+    mountRegistryHive = [
+        'Windows/System32/config/SOFTWARE'
+        'Windows/System32/config/DEFAULT'
+        'Users/Default/NTUSER.DAT'
+    ]
+
 	default {
 		Scheme = 'Haro Black'
 		AppStarting = 'haro_working.ani'
@@ -420,6 +427,12 @@ cursors {
 }
 
 themeColor {
+    mountRegistryHive = [
+        'Windows/System32/config/SOFTWARE'
+        'Windows/System32/config/DEFAULT'
+        'Users/Default/NTUSER.DAT'
+    ]
+
 	AccentColor = '0x2a29cc'
 	AccentColorInactive = '0x00cfcfcf'
 	ColorPrevalence = "1"
@@ -437,6 +450,130 @@ themeColor {
 		'0x00533C60'
 		'0x006E38FE'
 	]
+}
+
+soundTheme {
+    mountRegistryHive = [
+        'Users/Default/NTUSER.DAT'
+    ]
+
+	'Persona' {
+		displayName = 'Synthetic Persona'
+		isDefault = true
+		files = [
+			'Persona\\Windows Balloon (Persona).wav'
+			'Persona\\Windows Battery Critical (Persona).wav'
+			'Persona\\Windows Battery Low (Persona).wav'
+			'Persona\\Windows Critical Stop (Persona).wav'
+			'Persona\\Windows Ding (Persona).wav'
+			'Persona\\Windows Error (Persona).wav'
+			'Persona\\Windows Exclamation (Persona).wav'
+			'Persona\\Windows Feed Discovered (Persona).wav'
+			'Persona\\Windows Hardware Fail (Persona).wav'
+			'Persona\\Windows Hardware Insert (Persona).wav'
+			'Persona\\Windows Hardware Remove (Persona).wav'
+			'Persona\\Windows Information Bar (Persona).wav'
+			'Persona\\Windows Log-off Sound (Persona).wav'
+			'Persona\\Windows Logon (Persona).wav'
+			'Persona\\Windows Notify (Persona).wav'
+			'Persona\\Windows Notify Email (Persona).wav'
+			'Persona\\Windows Notify SMS (Persona).wav'
+			'Persona\\Windows Recycle (Persona).wav'
+		]
+		apps {
+			'.Default' {
+				'.Default' = 'C:\\Windows\\media\\Windows Background.wav'
+				'AppGPFault' = 'C:\\windows\\media\\Persona\\Windows Error (Persona).wav'
+				'CCSelect' = ''
+				'ChangeTheme' = ''
+				'Close' = ''
+				'CriticalBatteryAlarm' = 'C:\\windows\\media\\Persona\\Windows Battery Critical (Persona).wav'
+				'DeviceConnect' = 'C:\\windows\\media\\Persona\\Windows Hardware Insert (Persona).wav'
+				'DeviceDisconnect' = 'C:\\windows\\media\\Persona\\Windows Hardware Remove (Persona).wav'
+				'DeviceFail' = 'C:\\windows\\media\\Persona\\Windows Hardware Fail (Persona).wav'
+				'FaxBeep' = 'C:\\windows\\media\\Persona\\Windows Notify Email (Persona).wav'
+				'LowBatteryAlarm' = 'C:\\windows\\media\\Persona\\Windows Battery Low (Persona).wav'
+				'MailBeep' = 'C:\\windows\\media\\Persona\\Windows Notify Email (Persona).wav'
+				'Maximize' = ''
+				'MenuCommand' = ''
+				'MenuPopup' = ''
+				'MessageNudge' = 'C:\\windows\\media\\Windows Message Nudge.wav'
+				'Minimize' = ''
+				'Notification.Default' = 'C:\\windows\\media\\Windows Notify System Generic.wav'
+				'Notification.IM' = 'C:\\windows\\media\\Windows Notify Messaging.wav'
+				'Notification.Looping.Alarm' = 'C:\\windows\\media\\Alarm01.wav'
+				'Notification.Looping.Alarm10' = 'C:\\windows\\media\\Alarm10.wav'
+				'Notification.Looping.Alarm2' = 'C:\\windows\\media\\Alarm02.wav'
+				'Notification.Looping.Alarm3' = 'C:\\windows\\media\\Alarm03.wav'
+				'Notification.Looping.Alarm4' = 'C:\\windows\\media\\Alarm04.wav'
+				'Notification.Looping.Alarm5' = 'C:\\windows\\media\\Alarm05.wav'
+				'Notification.Looping.Alarm6' = 'C:\\windows\\media\\Alarm06.wav'
+				'Notification.Looping.Alarm7' = 'C:\\windows\\media\\Alarm07.wav'
+				'Notification.Looping.Alarm8' = 'C:\\windows\\media\\Alarm08.wav'
+				'Notification.Looping.Alarm9' = 'C:\\windows\\media\\Alarm09.wav'
+				'Notification.Looping.Call' = 'C:\\windows\\media\\Ring01.wav'
+				'Notification.Looping.Call10' = 'C:\\windows\\media\\Ring10.wav'
+				'Notification.Looping.Call2' = 'C:\\windows\\media\\Ring02.wav'
+				'Notification.Looping.Call3' = 'C:\\windows\\media\\Ring03.wav'
+				'Notification.Looping.Call4' = 'C:\\windows\\media\\Ring04.wav'
+				'Notification.Looping.Call5' = 'C:\\windows\\media\\Ring05.wav'
+				'Notification.Looping.Call6' = 'C:\\windows\\media\\Ring06.wav'
+				'Notification.Looping.Call7' = 'C:\\windows\\media\\Ring07.wav'
+				'Notification.Looping.Call8' = 'C:\\windows\\media\\Ring08.wav'
+				'Notification.Looping.Call9' = 'C:\\windows\\media\\Ring09.wav'
+				'Notification.Mail' = 'C:\\windows\\media\\Persona\\Windows Notify Email (Persona).wav'
+				'Notification.Proximity' = 'C:\\windows\\media\\Windows Proximity Notification.wav'
+				'Notification.Reminder' = 'C:\\windows\\media\\Windows Notify Calendar.wav'
+				'Notification.SMS' = 'C:\\windows\\media\\Persona\\Windows Notify SMS (Persona).wav'
+				'Open' = ''
+				'PrintComplete' = ''
+				'ProximityConnection' = 'C:\\windows\\media\\Windows Proximity Connection.wav'
+				'RestoreDown' = ''
+				'RestoreUp' = ''
+				'ShowBand' = ''
+				'SystemAsterisk' = 'C:\\windows\\media\\Persona\\Windows Ding (Persona).wav'
+				'SystemExclamation' = 'C:\\windows\\media\\Persona\\Windows Exclamation (Persona).wav'
+				'SystemExit' = ''
+				'SystemHand' = 'C:\\windows\\media\\Persona\\Windows Critical Stop (Persona).wav'
+				'SystemNotification' = 'C:\\windows\\media\\Persona\\Windows Notify (Persona).wav'
+				'SystemQuestion' = ''
+				'WindowsLogoff' = 'C:\\windows\\media\\Persona\\Windows Log-off Sound (Persona).wav'
+				'WindowsLogon' = 'C:\\windows\\media\\Persona\\Windows Logon (Persona).wav'
+				'WindowsUAC' = 'C:\\windows\\media\\Windows User Account Control.wav'
+				'WindowsUnlock' = 'C:\\windows\\media\\Windows Unlock.wav'
+			}
+			'Explorer' {
+				'ActivatingDocument' = ''
+				'BlockedPopup' = 'C:\\windows\\media\\Persona\\Windows Balloon (Persona).wav'
+				'EmptyRecycleBin' = 'C:\\windows\\media\\Persona\\Windows Recycle (Persona).wav'
+				'FeedDiscovered' = 'C:\\windows\\media\\Persona\\Windows Feed Discovered (Persona).wav'
+				'MoveMenuItem' = ''
+				'Navigating' = ''
+				'SearchProviderDiscovered' = ''
+				'SecurityBand' = 'C:\\windows\\media\\Persona\\Windows Information Bar (Persona).wav'
+			}
+			'sapisvr' {
+				'HubOffSound' = 'C:\\windows\\media\\Speech Off.wav'
+				'HubOnSound' = 'C:\\windows\\media\\Speech On.wav'
+				'HubSleepSound' = 'C:\\windows\\media\\Speech Sleep.wav'
+				'MisrecoSound' = 'C:\\Windows\\media\\Speech Misrecognition.wav'
+				'PanelSound' = 'C:\\windows\\media\\Speech Disambiguation.wav'
+			}
+		}
+	}
+}
+
+regional {
+    mountRegistryHive = [
+        'Users/Default/NTUSER.DAT'
+    ]
+
+    sLongDate = 'dddd, d MMMM, yyyy'
+    sShortDate = 'd/M/yyyy'
+    iDate = '1'
+    iFirstDayOfWeek = '0'
+    iMeasure = '0'
+    iPaperSize = '9'
 }
 
 #consoleColor {

@@ -31,6 +31,26 @@ printTask {
     }
 }
 
+will {
+    $sr = $BuildEnv.BMLocalizedData
+
+    # unload all registry mtpoints
+    $BuildEnv.registryMountPoint | Get-Member -MemberType NoteProperty | select -expand Name | ForEach-Object {
+        $regMountPoint = $BuildEnv.registryMountPoint."$_"
+        $hkMountPath = 'HKLM\' + $regMountPoint.Substring(6) # e.g. HKLM\svc_user
+
+        if (Test-Path $regMountPoint)
+        {
+            say ($rs.DismountingRegHive -f $regMountPoint)
+	        exec { reg.exe UNLOAD $hkMountPath } -MaxRetry 3 -RetryDelay 5
+        }
+        else
+        {
+        	say ($rs.SkipDismountRegHive -f $hkMountPath)
+        }
+    }
+}
+
 task default -depends Finish
 
 task Localize {
@@ -493,7 +513,8 @@ task Build -depends Discover -precondition { $Subcommand -eq 'Build' } {
             }
         }
     }
-    say ($targetModules -join ', ')
+
+    say ($sr.TargetModulesList -f ([Environment]::NewLine + '- ' + ($targetModules -join ([Environment]::NewLine + '- '))))
 
     if ($targetModules.Count -eq 0)
     {
@@ -501,17 +522,75 @@ task Build -depends Discover -precondition { $Subcommand -eq 'Build' } {
         return
     }
 
+    # foreach module in /src
     for ($i = 0; $i -lt $targetModules.Count; $i++)
     {
         $moduleName = $targetModules[$i]
 
-        if ($i -ne 0) { say -Divider }
+        # pretty line divider
+        say -Divider
         say ($sr.StartBuildModule -f $moduleName)
-        if ($i -eq 0) { say -Divider }
 
+        # mount required registry hives
+        $requiredRegMounts = $BuildEnv."$moduleName".mountRegistryHive
+        if ($requiredRegMounts)
+        {
+            $requiredRegMounts | ForEach-Object {
+                # no need to test path. everything in registryMountPoint is already prechecked.
+                if (-not $BuildEnv.registryMountPoint."$_")
+                {
+                    say ($sr.UndefinedRegistryHive -f $_)
+                }
+                else
+                {
+                    $hivePath = Join-Path $BuildEnv.mountDir -ChildPath $_
+                    $regMountPoint = $BuildEnv.registryMountPoint."$_"
+
+                    $hkMountPath = 'HKLM\' + $regMountPoint.Substring(6) # e.g. HKLM\svc_user
+                    say ($sr.MountingRegHive -f $hivePath, $regMountPoint)
+	                exec { reg.exe LOAD $hkMountPath $hivePath }
+                }
+            }
+        }
+
+        # invoke the module!
         $moduleScriptPath = Join-Path $BuildEnv.sourceDir -ChildPath "$moduleName\Install.ps1"
         Invoke-Builder $moduleScriptPath -NoLogo
-        
+
+        # dismount required registry hives
+        if ($requiredRegMounts)
+        {
+            $requiredRegMounts | ForEach-Object {
+                # no need to test path. everything in registryMountPoint is already prechecked.
+                if (-not $BuildEnv.registryMountPoint."$_")
+                {
+                    say ($sr.UndefinedRegistryHive -f $_)
+                }
+                else
+                {
+                    $regMountPoint = $BuildEnv.registryMountPoint."$_"
+                    $hkMountPath = 'HKLM\' + $regMountPoint.Substring(6) # e.g. HKLM\svc_user
+
+                    if (Test-Path $regMountPoint)
+                    {
+                        say ($sr.DismountingRegHive -f $regMountPoint)
+    	                exec { reg.exe UNLOAD $hkMountPath } -MaxRetry 3 -RetryDelay 5
+                    }
+                    else
+                    {
+                    	say ($sr.SkipDismountRegHive -f $hkMountPath)
+                    }
+                }
+            }
+        }
+
+        # last one also gets a pretty divider
+        if ($i -eq ($targetModules.Count - 1))
+        {
+            say -Divider
+        }
+
+        # keep going        
         continue
     }
 }

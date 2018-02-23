@@ -91,6 +91,11 @@ DumpingDrivers = Dumping all add-on drivers to "{0}". This may take a while...
 NoTargetModule = Unable to build because there is no effective targets.
 StartBuildModule = Starting build module: {0}
 DriverCommandNothingToDo = You need to type "build driver dump".
+MountingRegHive = Mounting registry hive to host: {0} --> {1}
+DismountingRegHive = Dismounting registry hive from host: {0}
+SkipDismountRegHive = The registry hive does not require dismounting: {0}
+UndefinedRegistryHive = The registry hive is undefined under "registryMountPoint": {0}
+TargetModulesList = The following modules will be targeted: {0}
 
 # ---- [ /Localized Data ] --------------------------------------------
 '@
