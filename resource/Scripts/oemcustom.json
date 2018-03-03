@@ -1,0 +1,27 @@
+{
+    "computerDescription": "My first computer",
+    "disableRemoteAssist": true,
+    "soundTheme": "Persona",
+    "enableColorTitlebar": true,
+    "defaultLocale": {
+        "sLongDate": "dddd, d MMMM, yyyy",
+        "sShortDate": "d/M/yyyy",
+        "iDate": "1",
+        "iFirstDayOfWeek": "0",
+        "iMeasure": "0",
+        "iPaperSize": "9"
+    },
+    "userName": "John",
+    "superuserName": "SuJohn",
+    "computerName": "Dodo",
+    "organizationName": "Fabrikom",
+    "timezone": "GMT Standard Time",
+    "accentColor": "0xff7195a7",
+    "ime": "en-US;zh-CN",
+    "autoLicenseAcceptance": false,
+    "kmsActivationServer": "kms.fabrikom.com:1688",
+    "windowsProductKey": "12345-ABCDE-12345-ABCDE-12345",
+    "firewall": {
+        "enable": ["RemoteDesktop*"]
+    }
+}
