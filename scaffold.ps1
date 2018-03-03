@@ -1,4 +1,4 @@
-﻿if (Test-Path C:\WindowsBuilder)
+if (Test-Path C:\WindowsBuilder)
 {
     Write-Error 'A copy of WindowsBuilder is already installed at "C:\WindowsBuilder". Remove the folder and try again.'
 }
