@@ -1,0 +1,22 @@
+﻿{
+    "disableRemoteAssist": true,
+    "enableColorTitlebar": true,
+    "timezone": "China Standard Time",
+    "ime": "en-US;zh-CN",
+    "accentColor": "0x00e64000",
+    "defaultLocale":  {
+        "iMeasure": "0",
+        "sLongDate": "dddd, d MMMM, yyyy",
+        "sShortDate": "d/M/yyyy",
+        "iDate": "1",
+        "iPaperSize": "9",
+        "iFirstDayOfWeek": "0"
+    },
+    "soundTheme": "Persona",
+    "autoLicenseAcceptance": false,
+    "kmsActivationServer": "kms.fabrikom.com:1688",
+    "windowsProductKey": "ABCDE-12345-ABCDE-12345-ABCDE",
+    "firewall": {
+        "enable": ["RemoteDesktop*"]
+    }
+}
