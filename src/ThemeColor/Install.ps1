@@ -23,13 +23,15 @@ task ModifyRegistry -depends Precheck {
     @($explorerAccentPath, $userExplorerAccentPath) | ForEach-Object {
         if (-not (Test-Path $_))
         {
-            md $_ | Out-Null
+            $regobj = md $_
+            $regobj.Dispose()
         }
     }
 
     $dwmProps = @(
         'AccentColor'
         'AccentColorInactive'
+        'ColorPrevalence'
     )
 
     $dwmProps | ForEach-Object {
@@ -89,7 +91,7 @@ task ModifyRegistry -depends Precheck {
         }
     }
 
-    
+    # no longer works in win10-1709
     $extraAccentsPath = $BuildEnv.registryMountPoint.'Windows/System32/config/SOFTWARE' + '\Microsoft\Windows\CurrentVersion\Themes\Accents'
 
     $themePaths = @(
@@ -117,7 +119,8 @@ task ModifyRegistry -depends Precheck {
             $accentFullPath = $extraAccentsPath + $themePaths[$i]
             if (-not (Test-Path $accentFullPath))
             {
-                md $accentFullPath -Force | Out-Null
+                $regobj = md $accentFullPath -Force
+                $regobj.Dispose()
             }
 
             Get-ItemProperty -Path $accentFullPath -Name Color -ErrorAction SilentlyContinue -ErrorVariable getPropErr
@@ -129,6 +132,8 @@ task ModifyRegistry -depends Precheck {
             New-ItemProperty -Path $accentFullPath -Name Color -PropertyType DWord -Value $BuildEnv.themeColor.oemColors[$i]
         }
     }
+
+    [gc]::Collect()
 }
 
 task Finalize -depends ModifyRegistry {
