@@ -59,11 +59,18 @@
 
 # ----------- custom -----------
 
+# Each of the root entries corresponds to a folder under /src. We call that a customizing module.
+# If you want to exclude a customizing module, just delete or comment out the entire entry.
+
+# Metro/UWP programs that are provisioned (installed by default for all users)
 appx {
+    # Everything here will be removed.
     remove = [
 		# --- Help and telemetry ---
 
-		'Microsoft.GetHelp'
+		# OEM customization is available
+		#'Microsoft.GetHelp'
+		
 		'Microsoft.Getstarted'
 		'Microsoft.WindowsFeedbackHub'
 
@@ -77,7 +84,8 @@ appx {
 		'microsoft.windowscommunicationsapps'
 
 		# Paid WiFi
-		'Microsoft.OneConnect'
+		# Removing this in 1709 also removes Net.Native.Runtime.1.4, which is required by win store
+		#'Microsoft.OneConnect'
 
 		'Microsoft.People'
 		'Microsoft.SkypeApp'
@@ -89,7 +97,7 @@ appx {
 		#'Microsoft.WindowsStore'
 
 		# Required for in-app purchases
-		'Microsoft.StorePurchaseApp'
+		#'Microsoft.StorePurchaseApp'
 
 		# Microsoft Pay
 		'Microsoft.Wallet'
@@ -130,9 +138,13 @@ appx {
     ]
 }
 
+# Most Windows functionality is delivered as component packages. Some (like OneDrive) requires unprotecting 
+# in order remove.
 package {
+    # Don't touch this
     mountRegistryHive = ['Windows/System32/config/SOFTWARE']
 
+    # Everything here will be unprotected, so they can be removed later
 	unprotect = [
 		# --- search ---
 		'Microsoft-Windows-Cortana-*'
@@ -185,10 +197,13 @@ package {
 		#'Microsoft-OneCore-Maps-*'
 	]
 
+    # This removes all that is unprotected. Make sure this goes AFTER unprotect
 	remove = ${package.unprotect}
 }
 
+# Some Windows features are delivered as capabilities. Most are IME and localization stuff.
 capability {
+    # Everything here will be removed
 	remove = [
 		'App.Support.QuickAssist*'
 		'OneCoreUAP.OneSync*'
@@ -205,19 +220,23 @@ capability {
 	]
 }
 
+# Optional features are what you get under Control Panel > Programs > Uninstall Windows Features
 optionalFeatures {
+    # Everything here will be enabled
 	enable = [
 		'Microsoft-Hyper-V-All'
 		'Microsoft-Windows-Subsystem-Linux'
 		'TelnetClient'
 		'TFTP'
 	]
+    # Everything here will be disabled
 	disable = [
 		'WorkFolders-Client'
 		'Printing-XPSServices-Features'
 		'FaxServicesClientPackage'
 		'Microsoft-Windows-Printing-XPSServices-Package'
 	]
+    # Everything here will be removed
 	remove = [
 		'SMB1Protocol'
 		'SMB1Protocol-Client'
@@ -225,11 +244,16 @@ optionalFeatures {
 	]
 }
 
+# This module enables 2 additional TTS voices that are hidden by default
 tts {
+    # don't touch this
     mountRegistryHive = ['Windows/System32/config/SOFTWARE']
 }
 
+# This module modifies the host file, which maps domain names to IP
 hostFile {
+    # All domains here will be blocked (mapped to 0.0.0.0)
+    # You PC won't be able to access these domains by name.
     block = [
 	    'vortex.data.microsoft.com'
 	    'vortex-win.data.microsoft.com'
@@ -300,18 +324,20 @@ hostFile {
     ]
 }
 
+# Customize the This PC > (right click) > properties page 
 oemInfo {
+    # Don't touch this
     mountRegistryHive = ['Windows/System32/config/SOFTWARE']
 
 	# new in win10-1709
 	#SupportProvider = ''
-	#SupportAppUrl = 'https://get.lizoc.com/pcsupport'
+	#SupportAppUrl = 'https://get.fabrikom.com/pcsupport'
 
-	SupportUrl = 'https://www.lizoc.com/support'
-	Manufacturer = 'Lizoc Inc'
+	SupportUrl = 'https://www.fabrikom.com/support'
+	Manufacturer = 'Fabrikom Corp'
 	Model = 'Generic Model'
 	SupportHours = '(UCT) Mon-Fri: 9:30 AM to 6:00 PM; Sat-Sun: 9:00 AM to 7:00 PM (excluding US public holidays)'
-	SupportPhone = 'US/Canada: +1-800-OEMNAME; E-mail: support@lizoc.com'
+	SupportPhone = 'US/Canada: +1-800-OEMNAME; E-mail: support@fabrikom.com'
 	HelpCustomized = true
 
 	# place these files under /resource
@@ -319,11 +345,15 @@ oemInfo {
 	pcLogo = 'oemlogo-pc.bmp'
 }
 
+# Customize the screen color when Windows crashes
+# Currently does not work with Win8.1 and above.
 bsodColor {
 	foreground = 'white'
 	background = 'red'
 }
 
+# Customize the default Windows wallpaper
+# Files should be in /resource folder
 wallpaper {
 	# 1920x1200
 	default = 'default-wallpaper.jpg'
@@ -337,15 +367,23 @@ wallpaper {
 	'default4k-3840x2160' = 'default-wallpaper-3840x2160.jpg'
 	'default4k-768x1024' = 'default-wallpaper-768x1024.jpg'
 	'default4k-768x1366' = 'default-wallpaper-768x1366.jpg'
+
+    # This will remove all wallpapers other than the default one.
 	removeExtra = true
 }
 
+# Customize the default lock screen image
+# Files should be in /resource folder
 lockScreen {
 	# 3840x2160
 	default = 'default-lockscreen-3840x2160.jpg'
+
+    # This will remove all lock screen images other than the default one.
 	removeExtra = true
 }
 
+# Customize the default account avatar
+# Files should be in /resource folder
 accountPicture {
 	guestBmp = 'guest.bmp'
 	guestPng = 'guest.png'
@@ -358,18 +396,24 @@ accountPicture {
 }
 
 # This will also enable startup sound to play on startup
+# Files should be in /resource folder
+# This only applies to the default account. If you want to apply to user accounts, you need to look 
+# at the files under /resource/Scripts and /resource/GroupPolicy/Scripts
 startupSound {
 	waveFile = 'Windows-Startup.wav'
 }
 
-# #todo persons and pin in win10-1709
+# Customize the default windows cursor
+# Files should be in /resource folder
 cursors {
+    # Don't touch this
     mountRegistryHive = [
         'Windows/System32/config/SOFTWARE'
         'Windows/System32/config/DEFAULT'
         'Users/Default/NTUSER.DAT'
     ]
 
+    # Sets the default scheme
 	default {
 		Scheme = 'Haro Black'
 		AppStarting = 'haro_working.ani'
@@ -388,6 +432,9 @@ cursors {
 		UpArrow = 'haro_up.cur'
 		Wait = 'haro_busy.ani'
 	}
+
+    # Custom schemes.
+    # Files should be in /resource
 	schemes {
 		'Haro Black' = [
 			'haro_arrow.cur'
@@ -405,6 +452,8 @@ cursors {
 			'haro_move.cur'
 			'haro_up.cur'
 			'haro_link.cur'
+			'aero_pin.cur'
+			'aero_person.cur'
 		]
 		'Haro Black (large)' = [
 			'haro_arrow_l.cur'
@@ -422,24 +471,34 @@ cursors {
 			'haro_move_l.cur'
 			'haro_up_l.cur'
 			'haro_link_l.cur'
+			'aero_pin_l.cur'
+			'aero_person_l.cur'
 		]
 	}
 }
 
+# Sets the default theme color
 themeColor {
+    # Don't touch this
     mountRegistryHive = [
         'Windows/System32/config/SOFTWARE'
         'Windows/System32/config/DEFAULT'
         'Users/Default/NTUSER.DAT'
     ]
 
+    # red
 	AccentColor = '0x2a29cc'
 	AccentColorInactive = '0x00cfcfcf'
+
+	# show color on titlebar
 	ColorPrevalence = "1"
+
 	AccentPalette = 'ff,b3,b3,00,ff,80,80,00,ff,59,5a,00,cc,29,2a,00,99,00,01,00,73,00,01,00,4d,00,00,00,88,17,98,00'
 	StartColorMenu = '0xff010099'
 	AccentColorMenu = '0xff0100cc'
 
+	# in 0xAlphaBlueGreenRed
+	# red, bright red, yellow, green, gray, brown, dark brown, pink
 	oemColors = [
 		'0x001500BE'
 		'0x000040E6'
@@ -452,11 +511,16 @@ themeColor {
 	]
 }
 
+# Sets the default sound scheme
+# This only applies to the default account. If you want to apply to user accounts, you need to look 
+# at the files under /resource/Scripts and /resource/GroupPolicy/Scripts
 soundTheme {
+    # Don't touch this
     mountRegistryHive = [
         'Users/Default/NTUSER.DAT'
     ]
 
+    # Custom sound themes
 	'Persona' {
 		displayName = 'Synthetic Persona'
 		isDefault = true
@@ -563,7 +627,12 @@ soundTheme {
 	}
 }
 
+# Custom default regional settings
+# Works with en-US only
+# This only applies to the default account. If you want to apply to user accounts, you need to look 
+# at the files under /resource/Scripts and /resource/GroupPolicy/Scripts
 regional {
+    # Don't touch this
     mountRegistryHive = [
         'Users/Default/NTUSER.DAT'
     ]
@@ -576,26 +645,43 @@ regional {
     iPaperSize = '9'
 }
 
-#consoleColor {
-#	# solarized dark theme
-#	# https://github.com/neilpa/cmd-colors-solarized/blob/master/solarized-dark.reg
-#
-#	ColorTable00 = '00362b00'
-#	ColorTable01 = '00969483'
-#	ColorTable02 = '00756e58'
-#	ColorTable03 = '00a1a193'
-#	ColorTable04 = '00164bcb'
-#	ColorTable05 = '00c4716c'
-#	ColorTable06 = '00837b65'
-#	ColorTable07 = '00d5e8ee'
-#	ColorTable08 = '00423607'
-#	ColorTable09 = '00d28b26'
-#	ColorTable10 = '00009985'
-#	ColorTable11 = '0098a12a'
-#	ColorTable12 = '002f32dc'
-#	ColorTable13 = '008236d3'
-#	ColorTable14 = '000089b5'
-#	ColorTable15 = '00e3f6fd'
-#	ScreenColors = '00000001'
-#	PopupColors = '000000f6'
-#}
+# Custom default start menu layout
+# You can export a layout on a live system using powershell: Export-StartLayout
+startMenu {
+	layout = 'startlayout.xml'
+}
+
+# These files and folders will be copied to the image.
+# Left hand side is the source, which should be in /resource
+# Right hand side is the target.
+# To copy a file, specify the path relative to /resource on the LHS, and the path relative to the mount point on the RHS
+# To copy a folder, make sure the LHS ends with /*, and the RHS ends with /
+copyFile {
+    'Scripts/FirstLogon.cmd' = 'Windows/Setup/Scripts/FirstLogon.cmd'
+    'Scripts/FirstLogon.ps1' = 'Windows/Setup/Scripts/FirstLogon.ps1'
+    'Scripts/SetupComplete.cmd' = 'Windows/Setup/Scripts/SetupComplete.cmd'
+    'Scripts/SetupComplete.ps1' = 'Windows/Setup/Scripts/SetupComplete.ps1'
+    'Scripts/oem-theme.png' = 'Windows/Web/oem-theme.png'
+    'Scripts/oemcustom.json' = 'Windows/Setup/Scripts/oemcustom.json'
+    'Scripts/unattend.xml' = 'Windows/System32/Sysprep/unattend.xml'
+    'Scripts/oobeinit.flag' = 'Users/Default/oobeinit.flag'
+    'GroupPolicy/*' = 'Windows/System32/GroupPolicy/'
+}
+
+# Customize the license file
+# File should be under /resource
+oemLicense {
+    rtfLicense = 'license-demo.rtf'
+}
+
+# Customize the search button on the task bar
+# New in Windows 10
+taskbarSearch {
+    # Don't touch this
+    mountRegistryHive = [
+        'Users/Default/NTUSER.DAT'
+    ]
+
+    # Hidden | Full | Icon
+	displayMode = 'Hidden'
+}

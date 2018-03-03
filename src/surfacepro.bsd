@@ -1,0 +1,14 @@
+# ==============================
+# Configuration for Surface Pro 3
+# ==============================
+
+# You should run `build win10-1709` first before this
+
+# Adds or remove drivers in the image
+driver {
+    # Path to additional drivers that will be added to the image.
+    # All INF under subfolders will be installed.
+    # This is mostly for OEM third party drivers.
+    # You can dump drivers off a live system using `build driver dump`
+    path = 'Driver-SurfacePro3'
+}
