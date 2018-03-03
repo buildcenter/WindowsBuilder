@@ -49,6 +49,8 @@ task ModifyRegistry -depends Precheck {
             $appBasePath = $BuildEnv.registryMountPoint.'Users/Default/NTUSER.DAT' + '\AppEvents\Schemes'
             $schemeInfoPath = $appBasePath + '\Names\' + $refName
 
+            Set-ItemProperty -Path $appBasePath -Name '(Default)' -Value $refName
+
             if (-not (Test-Path $schemeInfoPath))
             {
                 $schemeReg = md $schemeInfoPath -Force
