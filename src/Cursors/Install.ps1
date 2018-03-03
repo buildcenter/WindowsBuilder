@@ -27,24 +27,29 @@ task ModifyRegistry -depends Precheck {
             $schemeEntries = $BuildEnv.cursors.schemes."$schemeName" | ForEach-Object { '%SystemRoot%\Cursors\' + $_ }
             $schemeEntries += $schemeName
             $schemeValue = $schemeEntries -join ','
-        }
 
-        Get-ItemProperty -Path $schemeBasePath -Name $schemeName -ErrorAction SilentlyContinue -ErrorVariable getPropErr
-        if (-not $getPropErr)
-        {
-            Remove-ItemProperty -Path $schemeBasePath -Name $schemeName
+            say ("Adding theme {0}" -f $schemeName)
+
+            Get-ItemProperty -Path $schemeBasePath -Name $schemeName -ErrorAction SilentlyContinue -ErrorVariable getPropErr
+            if (-not $getPropErr)
+            {
+                Remove-ItemProperty -Path $schemeBasePath -Name $schemeName
+            }
+            New-ItemProperty -Path $schemeBasePath -Name $schemeName -PropertyType ExpandString -Value $schemeValue
         }
-        New-ItemProperty -Path $schemeBasePath -Name $schemeName -PropertyType ExpandString -Value $schemeValue
     }
 
     if ($BuildEnv.cursors.default)
     {
+        say ("Set default theme to {0}" -f $BuildEnv.cursors.default.Scheme)
         Set-ItemProperty -Path $schemeBasePath -Name '(Default)' -Value $BuildEnv.cursors.default.Scheme
 
         if (-not (Test-Path $defaultBasePath))
         {
             md $defaultBasePath | Out-Null
         }
+
+        Set-ItemProperty -Path $defaultBasePath -Name '(Default)' -Value $BuildEnv.cursors.default.Scheme
 
         $BuildEnv.cursors.default | Get-Member -MemberType NoteProperty | select -expand Name | where { $_ -ne 'Scheme' } | ForEach-Object {
             Set-ItemProperty -Path $defaultBasePath -Name $_ -Value ('%SystemRoot%\Cursors\' + $BuildEnv.cursors.default."$_")
@@ -55,8 +60,8 @@ task ModifyRegistry -depends Precheck {
         # The Scheme Source specifies the type of cursor scheme that is currently being used. 
         # 0 means default; 1 means user; 2 means system
         Set-ItemProperty -Path $defaultBasePath -Name 'Scheme Source' -Value 2
-        Set-ItemProperty -Path $userCursorPath -Name 'Scheme Source' -Value 2
-        Set-ItemProperty -Path $defaultUserCursorPath -Name 'Scheme Source' -Value 2
+        Set-ItemProperty -Path $userCursorPath -Name 'Scheme Source' -Value 1
+        Set-ItemProperty -Path $defaultUserCursorPath -Name 'Scheme Source' -Value 1
     }
 }
 
