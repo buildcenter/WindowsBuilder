@@ -59,7 +59,7 @@ Feedback
 
 Related Projects
 ================
-DotNetBuild dependencies live in their own repositories on GitHub:
+WindowsBuilder dependencies live in their own repositories on GitHub:
 * [Builder](https://www.github.com/buildcenter/Builder)
 * [PSTemplate](https://www.github.com/buildcenter/PSTemplate)
 * [PSCONFIGON](https://www.github.com/buildcenter/PSConfigon)
