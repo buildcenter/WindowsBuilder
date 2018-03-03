@@ -3,7 +3,6 @@ Windows Image Customization Tool
 WindowsBuilder is a tool for servicing Windows `WIM` image. You can now deep customize your Windows installation with ease!
 
 ```batchfile
-C:\> md WindowsBuilder && cd WindowsBuilder
 C:\WindowsBuilder\> powershell -Command "& { wget https://raw.githubusercontent.com/buildcenter/WindowsBuilder/master/scaffold.ps1 -UseBasicParsing | iex }"
 C:\WindowsBuilder\> build configure
 C:\WindowsBuilder\> build mount
