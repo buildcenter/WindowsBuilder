@@ -3,22 +3,17 @@ Windows Image Customization Tool
 WindowsBuilder is a tool for servicing Windows `WIM` image. You can now deep customize your Windows installation with ease!
 
 ```batchfile
-C:\> md win10 && cd win10
-C:\repo\> powershell -Command "& { wget https://raw.githubusercontent.com/buildcenter/WindowsBuilder/master/scaffold.ps1 -UseBasicParsing | iex }"
-C:\repo\> build configure
-C:\repo\> build mount
-C:\repo\> build
-C:\repo\> build dismount
+C:\> md WindowsBuilder && cd WindowsBuilder
+C:\WindowsBuilder\> powershell -Command "& { wget https://raw.githubusercontent.com/buildcenter/WindowsBuilder/master/scaffold.ps1 -UseBasicParsing | iex }"
+C:\WindowsBuilder\> build configure
+C:\WindowsBuilder\> build mount
+C:\WindowsBuilder\> build
+C:\WindowsBuilder\> build dismount
 ```
 
 Congrats! Your shiny new Windows image is ready!
 
-
-How to Customize
-================
-First make a copy of `/src/global.bsd` and name it something meaningful, like `win10.bsd`. Edit it with reference to the schema described below. 
-
-Your assets lives under `/resource` by default, so copy them there.
+We have prepared a [detailed walkthrough ](./docs/walkthrough.md) here.
 
 
 We Need Undo
