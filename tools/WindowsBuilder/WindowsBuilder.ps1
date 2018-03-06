@@ -109,6 +109,7 @@ task Help -depends Localize -precondition { $Subcommand -eq 'Help' } {
         'build dismount [undo]'
         'build [configuration]'
         'build driver dump'
+        'build split <path\to\install.wim>'
     )
 
     $examples = @{}
@@ -183,7 +184,7 @@ task Help -depends Localize -precondition { $Subcommand -eq 'Help' } {
 task Precheck -depends Localize {
     $sr = $BuildEnv.BMLocalizedData
 
-    $supportedSubcommands = @('Build', 'Mount', 'Dismount', 'Help', 'Configure', 'Driver')
+    $supportedSubcommands = @('Build', 'Mount', 'Dismount', 'Help', 'Configure', 'Driver', 'Split')
     assert ($Subcommand -in $supportedSubcommands) ($sr.UnsupportedSubcommand -f $Subcommand, ($supportedSubcommands -join ', '))
 
     # Configuration check. We still need to check further in setup
@@ -412,7 +413,7 @@ task Configure -depends Discover -precondition { $Subcommand -eq 'Configure' } {
     }
 }
 
-task Mount -depends Setup -precondition { $Subcommand -eq 'Mount' } {
+task Split -depends Setup -precondition { $Subcommand -eq 'Split' } {
     $sr = $BuildEnv.BMLocalizedData
 
     if ((-not $ReferenceImagePath) -or ($ReferenceImagePath -eq ''))
@@ -427,6 +428,37 @@ task Mount -depends Setup -precondition { $Subcommand -eq 'Mount' } {
     }
 
     if (-not [system.io.path]::IsPathRooted($refWimPath))
+    {
+        $refWimPath = Join-Path $BuildEnv.repoDir -ChildPath $refWimPath
+    }
+    $refWimPath = Resolve-Path $refWimPath | select -expand Path
+
+    assert (Test-Path $refWimPath -PathType Leaf) ($sr.ReferenceImageFileNotFound -f $refWimPath)
+
+    $wimFile = Get-Item $refWimPath
+    $swmFilePath = Join-Path $wimFile.Directory.FullName -ChildPath ($wimFile.BaseName + '.swm')
+    $swmFilePattern = Join-Path $wimFile.Directory.FullName -ChildPath ($wimFile.BaseName + '*.swm')
+
+    assert (-not (Test-Path $swmFilePath)) ($sr.SplitFilesAlreadyExist -f $swmFilePath)
+    say ($sr.CreatingSplitFiles -f $swmFilePattern)
+    Split-WindowsImage -ImagePath $refWimPath -SplitImagePath $swmFilePath -FileSize 1024 -CheckIntegrity
+}
+
+task Mount -depends Setup -precondition { $Subcommand -eq 'Mount' } {
+    $sr = $BuildEnv.BMLocalizedData
+
+    if ((-not $ReferenceImagePath) -or ($ReferenceImagePath -eq ''))
+    {
+        # interactive
+        say ($sr.PromptWimFilePath)
+        $refWimPath = Read-Host -Prompt '>'
+    }
+    else
+    {
+        $refWimPath = $ReferenceImagePath
+    }
+
+    if (-not [System.IO.Path]::IsPathRooted($refWimPath))
     {
         $refWimPath = Join-Path $BuildEnv.repoDir -ChildPath $refWimPath
     }
@@ -595,7 +627,7 @@ task Build -depends Discover -precondition { $Subcommand -eq 'Build' } {
     }
 }
 
-task Finish -depends Help, Configure, Build, Mount, Dismount, Driver {
+task Finish -depends Help, Configure, Build, Mount, Dismount, Driver, Split {
     $sr = $BuildEnv.BMLocalizedData
 
     say $sr.Goodbye

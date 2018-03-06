@@ -65,6 +65,12 @@ ModuleCannotUseReservedName = [!] A module is using a reserved name and will be 
 NoModuleAvailable = Unable to find any build modules.
 
 #
+# Split
+#
+SplitFilesAlreadyExist = The file or folder "{0}" already exists.
+CreatingSplitFiles = Creating split image files: {0}
+
+#
 # Mount
 #
 PromptWimFilePath = Enter the full file path to the Windows image file (normally named "install.wim")

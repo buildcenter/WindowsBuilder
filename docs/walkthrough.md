@@ -47,6 +47,12 @@ Be patient and let WindowsBuilder do the legwork. Then dismount the image and sa
 build dismount
 ```
 
+**TIPS** Saving a large WIM file can be very CPU and I/O intensive. Some ways to speed things up are:
+
+- Tune up your PC power plan to high performance
+- Disable antivirus active protection
+- Don't run any other heavyweight process with this
+
 
 Embedding drivers
 -----------------

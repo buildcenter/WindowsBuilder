@@ -24,6 +24,11 @@ rem build mount
 rem build mount [configuration] [?|<number>]
 if '%1'=='mount' goto cmd_mount
 
+rem split
+rem build split
+rem build split [path]
+if '%1'=='split' goto cmd_split
+
 rem dismount
 rem build dismount [undo]
 if '%1'=='dismount' goto cmd_dismount
@@ -39,6 +44,21 @@ goto cmd_build
 :cmd_configure
 rem build configure
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& '%SCRIPTDIR%\tools\Builder\Builder.ps1' '%SCRIPTDIR%\tools\WindowsBuilder\WindowsBuilder.ps1' -properties @{ Subcommand = 'Configure' }; if ($BuildEnv.BuildSuccess -eq $false) { exit 1 } else { exit 0 }"
+exit /B %errorlevel%
+
+
+:cmd_split
+rem build split
+rem build split <path>
+set SUBCOMMAND=%1
+shift
+set REF_IMG_PATH=%1
+if '%REF_IMG_PATH%'=='' goto split_interactive
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& '%SCRIPTDIR%\tools\Builder\Builder.ps1' '%SCRIPTDIR%\tools\WindowsBuilder\WindowsBuilder.ps1' -properties @{ Subcommand = 'Split'; ReferenceImagePath = '%REF_IMG_PATH%' }; if ($BuildEnv.BuildSuccess -eq $false) { exit 1 } else { exit 0 }"
+exit /B %errorlevel%
+
+:split_interactive
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& '%SCRIPTDIR%\tools\Builder\Builder.ps1' '%SCRIPTDIR%\tools\WindowsBuilder\WindowsBuilder.ps1' -properties @{ Subcommand = 'Split' }; if ($BuildEnv.BuildSuccess -eq $false) { exit 1 } else { exit 0 }"
 exit /B %errorlevel%
 
 
