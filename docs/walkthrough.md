@@ -112,5 +112,7 @@ Ready to Go
 -----------
 If you are trying to install Windows on a bare metal PC, go to the tutorial on [building your Windows PE](./walkthrough-winpe.md) USB drive.
 
+You can also install Windows on bare metal using a VHD. This is called "native boot". Check out [the tutorial here](./walkthrough-nativeboot.md).
+
 If your computer has Windows Hyper-V installed, and you want to install your image on a virtual machine, go to the 
 tutorial on [installing WIM on VHD](./walkthrough-vm.md).
