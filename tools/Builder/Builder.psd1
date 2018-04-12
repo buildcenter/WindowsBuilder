@@ -13,7 +13,7 @@
     RootModule = 'Builder.psm1'
 
     # Version number of this module.
-    ModuleVersion = '3.1.1024.0'
+    ModuleVersion = '3.2.1126.0'
 
     # ID used to uniquely identify this module
     GUID = 'f611135c-e6d9-444d-a4a7-e8a15728942b'

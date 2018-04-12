@@ -354,7 +354,8 @@ function Invoke-Task
                     }  
                     else 
                     {
-                        Die $_ 'InvokeTaskError' -NoWill
+                        WriteColoredOutput ($_ | Out-String) -ForegroundColor Red
+                        Die '' 'InvokeTaskError' -NoWill
                     }
                 }
             } 
