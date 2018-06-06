@@ -1,4 +1,7 @@
-﻿function Install-WindowsImage
+﻿Set-StrictMode -Version 3
+$ErrorActionPreference = "Stop"
+
+function Install-WindowsImage
 {
     <#
         .NOTES
@@ -64,9 +67,8 @@
             Specifies that the full path to the VHD(X) that is created should be
             returned on the pipeline.
 
-        .PARAMETER BCDBoot
-            By default, the version of BCDBOOT.EXE that is present in \Windows\System32
-            is used. If you need to specify an alternate version, use this parameter to do so.
+        .Parameter EnableTestSigning
+            Allows test signed drivers to load. Use this switch to disable driver signing enforcement.
 
         .PARAMETER NativeBoot
             Specifies the purpose of the VHD(x). Select to skip creation of BCD store
@@ -118,6 +120,10 @@
         .PARAMETER Compact
             Refer to the documentation of this parameter for the command 'Expand-WindowsImage' and 
             'Get-WindowsImage'.
+
+        .PARAMETER BCDBoot
+            By default, the version of BCDBOOT.EXE that is present in \Windows\System32
+            is used. If you need to specify an alternate version, use this parameter to do so.
 
         .PARAMETER LogLevel
             Refer to the documentation of this parameter for the command 'Expand-WindowsImage' and 
@@ -213,7 +219,7 @@
         [switch]$NativeBoot,
 
         [Parameter()]
-        [string]$BCDBoot = 'bcdboot.exe',
+        [switch]$EnableTestSigning,
 
         [Parameter()]
         [ValidateSet('None', 'Serial', '1394', 'USB', 'Local', 'Network')]
@@ -224,6 +230,9 @@
 
         [Parameter()]
         [switch]$Compact,
+
+        [Parameter()]
+        [string]$BCDBoot = 'bcdboot.exe',
 
         [Parameter()]
         [ValidateSet('Errors', 'Warnings', 'WarningsInfo')]
@@ -751,7 +760,7 @@
             Expand-WindowsImage @expandWindowsImageParams
 
             #
-            # User asked for a non-bootable image.
+            # User asked for a bootable image.
             #
             if (($PSCmdlet.ParameterSetName -eq 'ApplyToPhysicalDisk') -or (-not $NativeBoot))
             {
@@ -885,9 +894,44 @@
                                 '/set {default} debug on'
                             ) -NoNewWindow -Wait
 
+                            Write-Verbose ("Debugging using {0}" -f $bcdEditArgs[0])
                             $bcdEditArguments = @("/store $bcdStore") + $bcdEditArgs
-
                             Start-Process 'bcdedit.exe' -ArgumentList $bcdEditArguments -NoNewWindow -Wait
+                        }
+                    }
+                }
+
+                # Are we allowing test signing?
+                if ($EnableTestSigning)
+                {
+                    $bcdStores = @(
+                        "$($systemDrive)\boot\bcd",
+                        "$($systemDrive)\efi\microsoft\boot\bcd"
+                    )
+                    $bcdTemplatePath = "$($windowsDrive)\windows\system32\config\bcd-template"
+
+                    foreach ($bcdStore in $bcdStores)
+                    {
+                        if (Test-Path $bcdStore)
+                        {
+                            Write-Verbose "Enabling test signing for BCD store: $bcdStore"
+
+                            Start-Process 'bcdedit.exe' -ArgumentList @(
+                                "/store $bcdStore"
+                                '/set {default} TestSigning ON'
+                            ) -NoNewWindow -Wait
+
+                            # pcat entry guid
+                            Start-Process 'bcdedit.exe' -ArgumentList @(
+                                "/store $bcdTemplatePath"
+                                '/set {a1943bbc-ea85-487c-97c7-c9ede908a38a} TestSigning ON'
+                            ) -NoNewWindow -Wait
+
+                           # efi entry guid
+                            Start-Process 'bcdedit.exe' -ArgumentList @(
+                                "/store $bcdTemplatePath"
+                                '/set {b012b84d-c47c-4ed5-b722-c0c42163e569} TestSigning ON'
+                            ) -NoNewWindow -Wait
                         }
                     }
                 }
@@ -980,3 +1024,155 @@
         }
     }
 }
+
+function Get-NativeBootVHD
+{
+    [CmdletBinding()]
+    Param(
+        [Parameter()]
+        [string]$StorePath
+    )
+
+    if ($StorePath)
+    {
+        $bcdParams = @{ StorePath = $StorePath }
+    }
+    else
+    {
+        $bcdParams = @{ Online = $true }
+    }
+
+    Get-WindowsBootRecord @bcdParams | where { 
+        ($_.osdevice -like 'vhd=*') -or 
+        ($_.device -like 'vhd=*') 
+    }
+}
+
+function Remove-NativeBootVHD
+{
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string]$Description,
+
+        [Parameter()]
+        [string]$StorePath
+    )
+
+    $bcdParams = @{}
+    if ($StorePath)
+    {
+        $bcdParams.StorePath = $StorePath
+    }
+
+    Get-NativeBootVHD @bcdParams | where { $_.Description -eq $Description } | ForEach-Object {
+        Remove-WindowsBootRecord @bcdParams -Identifier $_.Identifier
+        $_
+    }
+}
+
+
+function Add-NativeBootVHD
+{
+    [CmdletBinding()]
+    Param(
+        [Parameter(Position = 1)]
+        [ValidateScript({ 
+            (Test-Path $(Resolve-Path $_) -PathType Leaf) -and
+            (($_ -like '*.vhd') -or ($_ -like '*.vhdx'))
+        })]
+        [string]$SourcePath,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ 
+            ($_ -like '*.vhd') -or ($_ -like '*.vhdx')
+        })]
+        [string]$Destination,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Description,
+
+        [Parameter()]
+        [switch]$DefaultBootOption,
+
+        [Parameter()]
+        [string]$StorePath
+    )
+
+    $bcdParams = @{}
+    if ($StorePath)
+    {
+        $bcdParams.StorePath = $StorePath
+    }
+
+    $existingNBV = Get-NativeBootVHD @bcdParams | where { $_.Description -eq $Description }
+    if ($existingNBV)
+    {
+        throw "The description must be unique. Use 'Get-NativeBootVHD' to see a list of descriptions already used."
+    }
+
+    $destLiteralPath = Resolve-Path $Destination -ErrorAction SilentlyContinue -ErrorVariable resolvePathErr | select -expand Path
+    if ($resolvePathErr)
+    {
+        $destLiteralPath = $resolvePathErr[0].TargetObject
+    }
+
+    if ($SourcePath -and (Test-Path $destLiteralPath))
+    {
+        throw "VHD already exists: $destLiteralPath"
+    }
+
+    $destDir = Split-Path $destLiteralPath -Parent
+
+    if ($destDir -eq '')
+    {
+        throw "Placing native boot VHD in drive root is not supported. Specify a path with directory, e.g. C:\BOOTIMG\myos.vhdx"
+    }
+
+    $destDirAcl = 'O:S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464G:S-1-5-21-3743141187-1647405133-3778558433-513D:PAI(A;OICIIO;FA;;;CO)(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)'
+
+    if (-not (Test-Path $destDir))
+    {
+        Write-Verbose "Creating destination directory"
+
+        md $destDir | Out-Null
+        $acl = Get-Acl $destDir
+        $acl.SetSecurityDescriptorSddlForm($destDirAcl)
+        $acl | Set-Acl $destDir
+    }
+    elseif (Test-Path $destDir -PathType Container)
+    {
+        $acl = Get-Acl $destDir
+        if ($acl.Sddl -ne $destDirAcl)
+        {
+            Write-Warning "Destination directory is unprotected. Repair ACL."
+            $acl.SetSecurityDescriptorSddlForm($destDirAcl)
+            $acl | Set-Acl $destDir
+        }
+    }
+    else
+    {
+        throw "Unable to create path: $destDir"
+    }
+
+    $destRoot = [System.IO.Path]::GetPathRoot($destLiteralPath)
+    $destWithoutRoot = $destLiteralPath.Substring($destRoot.Length)
+
+    if ($SourcePath)
+    {
+        Write-Verbose "Copying VHD file. This may take a while..."
+        copy $SourcePath $destLiteralPath
+    }
+
+    $bcdid = Copy-WindowsBootRecord @bcdParams -Source '{current}' -Description $Description | select -expand Identifier
+    Set-WindowsBootRecord @bcdParams -Identifier $bcdid -Property osdevice -Value ('vhd=[locate]\{0}' -f $destWithoutRoot)
+    Set-WindowsBootRecord @bcdParams -Identifier $bcdid -Property device -Value ('vhd=[locate]\{0}' -f $destWithoutRoot)
+
+    if ($DefaultBootOption -and (-not $StorePath))
+    {
+        Set-WindowsBootOrder -Default $bcdid
+    }
+
+    Get-NativeBootVHD @bcdParams | where { $_.Identifier -eq $bcdid }
+}
+
