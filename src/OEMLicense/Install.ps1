@@ -13,7 +13,16 @@ task CopyFiles -depends Precheck {
         return
     }
 
-    $targetFile = Join-Path $BuildEnv.mountDir -ChildPath 'windows\System32\en-US\Licenses\Volume\Enterprise\license.rtf'
+    if (-not $BuildEnv.oemLicense.language)
+    {
+        $userLang = 'en-US'
+    }
+    else
+    {
+        $userLang = $BuildEnv.oemLicense.language
+    }
+
+    $targetFile = Join-Path $BuildEnv.mountDir -ChildPath "windows\System32\$userLang\Licenses\Volume\Enterprise\license.rtf"
 
 	$origAcl = Get-Acl $targetFile
 	Grant-AdminFullFileAccess -Path $targetFile

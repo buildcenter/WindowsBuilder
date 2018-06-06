@@ -670,8 +670,11 @@ copyFile {
 
 # Customize the license file
 # File should be under /resource
+# language should match the culture id of your Windows image. Defaults to 'en-US'
+# you can double check your Windows culture by looking for the 'windows\System\<culture_id>\Licenses' folder
 oemLicense {
     rtfLicense = 'license-demo.rtf'
+    language = 'en-US'
 }
 
 # Customize the search button on the task bar
