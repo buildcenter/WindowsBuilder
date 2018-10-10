@@ -14,7 +14,7 @@ will {
 task default -depends Finalize
 
 task Precheck {
-	assert ($BuildEnv.themeColor) "The themeColor entry is empty or undefined."
+	assert ($BuildEnv.package) "The package entry is empty or undefined."
 
     @(
         'Windows/System32/config/SOFTWARE'
