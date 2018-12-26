@@ -26,8 +26,7 @@ build mount .\working\output\install.wim
 ```
 
 Your WIM image probably contains multiple versions of Windows. WindowsBuilder will analyze the WIM file and prompt you to select the version to mount. We 
-are using #3 (Windows Enterprise). Mounting and dismounting can take a long time, especially on magnetic hard disks. We strongly recommend doing this on an 
-SSD.
+are using #3 (Windows Enterprise). Mounting and dismounting can take a long time, especially on magnetic hard disks. We strongly recommend doing this on a fast SSD.
 
 Next, you will normally be making a copy of `C:\WindowsBuilder\src\global.bsd` to something meaningful. We have already made one `win10-1709.bsd`, so 
 let's work with that for now. Go ahead and open `C:\WindowsBuilder\src\win10-1709.bsd` with your favorite text editor. Follow our inline documentation 
