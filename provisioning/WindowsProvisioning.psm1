@@ -1,22 +1,9 @@
-﻿Set-StrictMode -Version 3
+Set-StrictMode -Version 3
 $ErrorActionPreference = "Stop"
 
 function Install-WindowsImage
 {
     <#
-        .NOTES
-            Copyright (c) 2018 Lizoc Corporation. All rights reserved.
-
-            Use of this sample source code is subject to the terms of the Lizoc
-            license agreement under which you licensed this sample source code. If
-            you did not accept the terms of the license agreement, you are not
-            authorized to use this sample source code. For the terms of the license,
-            please see the license agreement between you and Lizoc or, if applicable,
-            see the LICENSE.txt file on your install media or the root of your tools 
-            installation.
-
-            THE SAMPLE SOURCE CODE IS PROVIDED "AS IS", WITH NO WARRANTIES.
-
         .SYNOPSIS
             Installs the Windows operating system onto a physical disk or VHD.
 
@@ -181,11 +168,25 @@ function Install-WindowsImage
             DESCRIPTION
             -----------
             Serial debugging will be enabled in the VHD via COM2 at a baud rate of 38400bps.
+
+        .NOTES
+            Copyright (c) 2018 Lizoc Corporation. All rights reserved.
+
+            Use of this sample source code is subject to the terms of the Lizoc
+            license agreement under which you licensed this sample source code. If
+            you did not accept the terms of the license agreement, you are not
+            authorized to use this sample source code. For the terms of the license,
+            please see the license agreement between you and Lizoc or, if applicable,
+            see the LICENSE.txt file on your install media or the root of your tools 
+            installation.
+
+            THE SAMPLE SOURCE CODE IS PROVIDED "AS IS", WITH NO WARRANTIES.
     #>
 
     #Requires -Version 3.0
 
-    [CmdletBinding(DefaultParameterSetName = "ApplyToVHD",
+    [CmdletBinding(
+        DefaultParameterSetName = "ApplyToVHD",
         HelpURI = "https://buildcenter.github.io/windowstools/install-windowsimage")]
     Param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
@@ -1175,4 +1176,3 @@ function Add-NativeBootVHD
 
     Get-NativeBootVHD @bcdParams | where { $_.Identifier -eq $bcdid }
 }
-
