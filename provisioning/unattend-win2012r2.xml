@@ -4,6 +4,16 @@
         <component name="Microsoft-Windows-SQMApi" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <CEIPEnabled>0</CEIPEnabled>
         </component>
+        <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <RunSynchronous>
+                <RunSynchronousCommand wcm:action="add">
+                    <WillReboot>OnRequest</WillReboot>
+                    <Description>Cloud-init set hostname</Description>
+                    <Path>cmd.exe /c ""C:\Program Files\Cloudbase Solutions\Cloudbase-Init\Python\Scripts\cloudbase-init.exe" --config-file "C:\Program Files\Cloudbase Solutions\Cloudbase-Init\conf\cloudbase-init-unattend.conf" &amp;&amp; exit 1 || exit 2"</Path>
+                    <Order>1</Order>
+                </RunSynchronousCommand>
+            </RunSynchronous>
+        </component>
         <component name="Microsoft-Windows-Disk-Failure-Diagnostic-Module" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="NonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <EnabledScenarioExecutionLevel>1</EnabledScenarioExecutionLevel>
         </component>
@@ -33,6 +43,13 @@
         </component>
     </settings>
     <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-HelpAndSupport" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="NonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <HelpAndSupport>
+                <Manufacturer>{{ $supportOem }}</Manufacturer>
+                <SearchContent>false</SearchContent>
+                <SupportSearchURL>{{ $supportUrl }}</SupportSearchURL>
+            </HelpAndSupport>
+        </component>
         <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <InputLocale>en-US</InputLocale>
             <SystemLocale>en-US</SystemLocale>
@@ -40,14 +57,13 @@
             <UserLocale>en-US</UserLocale>
         </component>
         <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <OOBE>
-                <HideEULAPage>true</HideEULAPage>
-                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
-                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
-                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
-                <NetworkLocation>Work</NetworkLocation>
-                <ProtectYourPC>3</ProtectYourPC>
-            </OOBE>
+            <RegisteredOrganization>{{ $registerOrg }}</RegisteredOrganization>
+            <RegisteredOwner>{{ $registerUser }}</RegisteredOwner>
+            <ShowPowerButtonOnStartScreen>true</ShowPowerButtonOnStartScreen>
+            <TimeZone>{{ $timezone }}</TimeZone>
+            <BluetoothTaskbarIconEnabled>false</BluetoothTaskbarIconEnabled>
+            <DisableAutoDaylightTimeSet>false</DisableAutoDaylightTimeSet>
+            <DoNotCleanTaskBar>true</DoNotCleanTaskBar>
             <OEMInformation>
                 <SupportURL>{{ $supportUrl }}</SupportURL>
                 <Model>{{ $supportModel }}</Model>
@@ -56,13 +72,14 @@
                 <SupportPhone>{{ $supportPhone }}</SupportPhone>
                 <SupportHours>{{ $supportHours }}</SupportHours>
             </OEMInformation>
-        </component>
-        <component name="Microsoft-Windows-HelpAndSupport" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="NonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <HelpAndSupport>
-                <Manufacturer>{{ $supportOem }}</Manufacturer>
-                <SearchContent>false</SearchContent>
-                <SupportSearchURL>{{ $supportUrl }}</SupportSearchURL>
-            </HelpAndSupport>
+            <OOBE>
+                <HideEULAPage>true</HideEULAPage>
+                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+                <NetworkLocation>Work</NetworkLocation>
+                <ProtectYourPC>3</ProtectYourPC>
+            </OOBE>
         </component>
     </settings>
     <cpi:offlineImage cpi:source="wim:c:/windowsbuilder/working/output/install.wim#Windows Server 2012 R2 SERVERDATACENTERCORE" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
