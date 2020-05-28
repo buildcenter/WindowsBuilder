@@ -508,6 +508,22 @@ function Install-WindowsImage
             Write-Verbose ("Switching to non-hypervisor mode")
         }
 
+        # check support compact and wimboot
+        $expandWimCmdlet = Get-Command Expand-WindowsImage
+        $supportCompress = $expandWimCmdlet.Parameters.Keys.Contains('Compact')
+        $supportWimBoot = $expandWimCmdlet.Parameters.Keys.Contains('WIMBoot')
+
+        if ($Compact -and ($supportCompress -eq $false))
+        {
+            throw "A parameter is not supported by the platform: -Compact"
+        }
+
+        if ($WIMBoot -and ($supportWimBoot -eq $false))
+        {
+            throw "A parameter is not supported by the platform: -WIMBoot"
+        }
+
+
         $disk = $null
 
         try
@@ -742,8 +758,15 @@ function Install-WindowsImage
                 ApplyPath = $windowsDrive
                 ImagePath = $ImagePath
                 Index = $Index
-                WIMBoot = $WIMBoot
-                Compact = $Compact
+            }
+
+            if ($supportCompress)
+            {
+                $expandWindowsImageParams.Compact = $Compact
+            }
+            if ($supportWimBoot)
+            {
+                $expandWindowsImageParams.WIMBoot = $WIMBoot
             }
 
             if ($ImagePath -like '*.swm')
